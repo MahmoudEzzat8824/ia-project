@@ -1,14 +1,24 @@
 import { useState } from 'react';
-import Login from './components/Login';
-import Signup from './components/Signup';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import BookPost from './pages/BookPost';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import ProfilePage from './pages/ProfilePage';
+import EditProfilePage from './pages/EditProfilePage';
 
 function App() {
-  const [page, setPage] = useState('login');
+
 
   return (
-    <div className="app-container">
-      {page === 'login' ? <Login setPage={setPage} /> : <Signup setPage={setPage} />}
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/signup" element={<Signup />} /> 
+        <Route path="/bookpost" element={<BookPost />} />
+        <Route path="/ProfilePage" element={<ProfilePage />} />
+        <Route path="/EditProfilePage" element={<EditProfilePage />} />
+      </Routes>
+    </Router>
   );
 }
 
