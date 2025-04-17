@@ -5,7 +5,7 @@ import BookPost from './pages/BookPost';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ProfilePage from './pages/ProfilePage';
 import EditProfilePage from './pages/EditProfilePage';
-import AdminPage from './pages/AdminPage';
+import AdminDashboard from './pages/AdminDashboard';
 
 function App() {
 
@@ -18,7 +18,7 @@ function App() {
         <Route path="/bookpost" element={<BookPost />} />
         <Route path="/ProfilePage" element={<ProfilePage />} />
         <Route path="/EditProfilePage" element={<EditProfilePage />} />
-        <Route path="/AdminPage" element={<AdminPage />} />
+        <Route path="/AdminDashboard" element={<AdminDashboard />} />
       </Routes>
     </Router>
   );

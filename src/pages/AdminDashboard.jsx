@@ -3,7 +3,7 @@ import TopBar from '../components/top_bar';
 
 // API Calls
 
-const AdminPage = () => {
+const AdminDashboard = () => {
   const [bookOwners, setBookOwners] = useState([]);
   const [bookPosts, setBookPosts] = useState([]);
 
@@ -38,4 +38,4 @@ const AdminPage = () => {
   );
 };
 
-export default AdminPage;
+export default AdminDashboard;
