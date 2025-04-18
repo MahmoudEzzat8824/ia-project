@@ -166,3 +166,62 @@
 .edit_profile_button:hover {
   background-color: #003d80;
 }
+
+.UserNameAtEditProfile{
+  display: inline-block;
+  font-size: xx-large;
+  margin-top: 50px;
+}
+
+.EditButton{
+  display: inline-block;
+  font-size: x-large;
+  margin-left: 25px;
+  width: 75px;
+  border-radius: 5px;
+  background-color: #003d80;
+  color: white;
+}
+.EditButton:hover{
+  background-color: #0056b3;
+}
+
+.PasswordAtEditProfile{
+  display: inline-block;
+  font-size: xx-large;
+  margin-top: 50px;
+}
+.EmailAtEditProfile{
+  display: inline-block;
+  font-size: xx-large;
+  margin-top: 50px;
+}
+.PhoneNumberAtEditProfile{
+  display: inline-block;
+  font-size: xx-large;
+  margin-top: 50px;
+}
+
+.editProfileTextBox{
+  margin-left: 5px;
+  width: 200px;
+  height: 30px;
+  padding: 10px;
+  font-size: 16px;
+  color: #333;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.SaveEditButton{
+  margin-left: 20px;
+  border-radius: 5px;
+  width: 50px;
+  background-color:#14ace8;
+  color: white;
+}
+
+.SaveEditButton:hover{
+  background-color: #003d80;
+}
