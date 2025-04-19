@@ -9,7 +9,6 @@ function PasswordInput({ password, setPassword, showPassword, setShowPassword, c
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         className="input-field pr-10"
-        placeholder="••••••••"
         required
       />
       <button

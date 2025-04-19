@@ -7,7 +7,6 @@ function EmailInput({ email, setEmail, className }) {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="input-field"
-          placeholder="you@example.com"
           required
         />
       </div>
