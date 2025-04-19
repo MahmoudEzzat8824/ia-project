@@ -128,22 +128,6 @@ function Signup({ setPage }) {
           >
             {showPassword ? <EyeSlashIcon className="icon" /> : <EyeIcon className="icon" />}
           </button>
-          {/* {password && (
-            <div className="password-strength">
-              Password Strength:{' '}
-              <span
-                className={
-                  passwordStrength === 'Weak'
-                    ? 'text-red-500'
-                    : passwordStrength === 'Medium'
-                    ? 'text-yellow-500'
-                    : 'text-green-500'
-                }
-              >
-                {passwordStrength}
-              </span>
-            </div>
-          )} */}
         </div>
         <button
           onClick={handleSignup}
