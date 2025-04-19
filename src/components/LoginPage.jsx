@@ -1,29 +1,36 @@
 import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import UsernameInput from './UsernameInput';
 import PasswordInput from './PasswordInput';
 import SubmitButton from './SubmitButton';
 import SwitchLink from './SwitchLink';
+import authService from '../services/auth.service';
 
 function LoginPage({ setPage }) {
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
-
     if (!userName || !password) {
       setError('Username and password are required');
       return;
     }
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      alert('Login successful (mock response)');
+      let response;
+      const headers = { 'Content-Type': 'application/json' };
+
+      await authService.login(userName,password)
+
+      navigate('/AdminDashboard', { replace: true });
     } catch (err) {
-      setError('Login failed');
+      console.error('Login error:', err);
+      setError(err.message || 'Login failed. Please check your network or server configuration.');
     }
   };
 
