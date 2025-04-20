@@ -2,7 +2,7 @@ import axios from "axios";
 
 const API_URL = "https://localhost:7200";
 
-const formLogin = (adminName, passwordHash) => {
+const AdminLogin = (adminName, passwordHash) => {
   return axios
     .post(`${API_URL}/api/admin/login`, {
       adminName,
@@ -20,8 +20,48 @@ const formLogin = (adminName, passwordHash) => {
     });
 };
 
+
+const BookOwnerLogin = (bookOwnerName, password) => {
+  return axios
+    .post(`${API_URL}/api/bookowner/login`, {
+      bookOwnerName,
+      password,
+    })
+    .then((response) => {
+      if (response.data.token) {
+        localStorage.setItem("token", JSON.stringify(response.data));
+      }
+      return response.data;
+    })
+    .catch((error) => {
+      console.error("Login API error:", error);
+      throw error;
+    });
+};
+
+const ReaderLogin = (readerName, password) => {
+  return axios
+    .post(`${API_URL}/api/reader/login`, {
+      readerName,
+      password,
+    })
+    .then((response) => {
+      if (response.data.token) {
+        localStorage.setItem("token", JSON.stringify(response.data));
+      }
+      return response.data;
+    })
+    .catch((error) => {
+      console.error("Login API error:", error);
+      throw error;
+    });
+};
+
+
 const authService = {
-  login: formLogin,
+  AdminLogin,
+  BookOwnerLogin,
+  ReaderLogin,
 };
 
 export default authService;

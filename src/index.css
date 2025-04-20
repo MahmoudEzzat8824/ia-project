@@ -299,3 +299,34 @@
     width: 70px;
   }
 }
+
+.role-selector {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin: 30px 0;
+}
+
+.circle {
+  width: 100px;
+  height: 100px;
+  border: 3px solid #888;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  background-color: #f9f9f9;
+}
+
+.circle:hover {
+  background-color: #e0e0e0;
+}
+
+.circle.selected {
+  background-color: #4caf50;
+  color: white;
+  border-color: #4caf50;
+}

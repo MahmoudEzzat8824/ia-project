@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import EmailInput from './EmailInput';
 import PasswordInput from './PasswordInput';
 import PhoneNumberInput from './PhoneNumberInput';
 import UsernameInput from './UsernameInput';
+import SSNInput from './SSNInput';
 
 function SignupPage({ setPage }) {
   const [email, setEmail] = useState('');
@@ -13,7 +14,11 @@ function SignupPage({ setPage }) {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [emailError, setEmailError] = useState('');
   const [phoneError, setPhoneError] = useState('');
+  const [ssn, setSsn] = useState('');
+  const [ssnError, setSsnError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [userType, setUserType] = useState('reader');
+  const navigate = useNavigate();
 
   const validateEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -25,6 +30,12 @@ function SignupPage({ setPage }) {
     return re.test(phone);
   };
 
+  const validateSsn = (ssn) => {
+    // Accepts XXX-XX-XXXX or XXXXXXXXX format
+    const re = /^\d{3}-?\d{2}-?\d{4}$/;
+    return re.test(ssn.replace(/\s/g, '')); // Remove spaces for validation
+  };
+
 
   const handlePasswordChange = (e) => {
     const pwd = e.target.value;
@@ -33,35 +44,104 @@ function SignupPage({ setPage }) {
 
   const handleSignup = async (e) => {
     e.preventDefault();
+    console.log('handleSignup called with:', { userName, email, phoneNumber, userType, ssn });
     setError('');
     setEmailError('');
+    setPhoneError('');
+    setSsnError('');
 
-    if (!userName || !email || !password || !phoneNumber) {
+    if (!userName || !email || !password || !phoneNumber || (userType === 'bookowner' && !ssn)) {
+      console.log('Missing fields:', { userName, email, password, phoneNumber, ssn });
       setError('All fields are required');
       return;
     }
 
     if (!validateEmail(email)) {
+      console.log('Invalid email:', email);
       setEmailError('Please enter a valid email');
       return;
     }
 
     if (!validatePhone(phoneNumber)) {
+      console.log('Invalid phone:', phoneNumber);
       setPhoneError('Please enter a valid phone number (10-15 digits)');
       return;
     }
 
+    if (userType === 'bookowner' && !validateSsn(ssn)) {
+      console.log('Invalid SSN:', ssn);
+      setSsnError('Please enter a valid SSN (XXX-XX-XXXX or 9 digits)');
+      return;
+    }
+
     try {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        if (email === 'test@example.com') {
-          throw new Error('Email already exists');
-        }
-        alert('Signup successful (mock response)');
-        setPage('login');
-      } catch (err) {
-        setError(err.message || 'Signup failed');
+      let response;
+      const headers = { 'Content-Type': 'application/json' };
+      console.log('Sending fetch request for:', userType);
+
+      switch (userType) {
+        case 'bookowner':
+          response = await fetch('https://localhost:7200/api/bookowner/signup', {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({
+              bookOwnerName: userName,
+              password,
+              ssn: ssn.replace(/[-\s]/g, ''),
+              requestStatus: 'Pending',
+              email,
+              phoneNumber,
+            }),
+          });
+          break;
+
+        case 'reader':
+          response = await fetch('https://localhost:7200/api/reader/signup', {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({
+              readerName: userName,
+              password,
+              email,
+              phoneNumber,
+            }),
+          });
+          break;
+
+        default:
+          throw new Error('Invalid user type');
       }
-    };
+
+      if (!response.ok) {
+        const contentType = response.headers.get('content-type');
+        let errorMessage = `Signup failed: ${response.status} ${response.statusText}`;
+
+        if (contentType && contentType.includes('application/json')) {
+          const errorData = await response.json();
+          errorMessage = errorData.errors
+            ? Object.values(errorData.errors).flat().join('; ')
+            : errorData.title || errorMessage;
+        } else {
+          const text = await response.text();
+          errorMessage = text || errorMessage;
+        }
+
+        throw new Error(errorMessage);
+      }
+
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        await response.json();
+      }
+
+      console.log('Signup successful, redirecting to login');
+      alert(`Signup successful as ${userType === 'bookowner' ? 'Book Owner' : 'Reader'}`);
+      navigate('/', { replace: true });
+    } catch (err) {
+      console.error('Signup error:', err);
+      setError(err.message || 'Signup failed. Please check your network or server configuration.');
+    }
+  };
 
     return (
         <div className="form-container">
@@ -80,11 +160,20 @@ function SignupPage({ setPage }) {
           setEmail={setEmail}
           className="input-group"
             />
+            {userType === 'bookowner' &&
+            <div className="input-group">
+            <SSNInput
+            ssn ={ssn}
+            setSsn={setSsn}
+            className="input-group"
+            />
+            </div>
+            }
             <PhoneNumberInput
             phoneNumber={phoneNumber}
             setPhoneNumber={setPhoneNumber}
             className="input-group"
-          />
+            />
             <PasswordInput
           password={password}
           setPassword={setPassword}
@@ -92,7 +181,36 @@ function SignupPage({ setPage }) {
           setShowPassword={setShowPassword}
           className="input-group relative"
             />
+            
+            <div className="input-group">
+              <label className="block mb-2">Account Type:</label>
+              <div className="flex space-x-4">
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    name="userType"
+                    value="reader"
+                    checked={userType === 'reader'}
+                    onChange={(e) => setUserType(e.target.value)}
+                    className="form-radio"
+                  />
+                  <span>Reader</span>
+                </label>
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    name="userType"
+                    value="bookowner"
+                    checked={userType === 'bookowner'}
+                    onChange={(e) => setUserType(e.target.value)}
+                    className="form-radio"
+                  />
+                  <span>Book Owner</span>
+                </label>
+              </div>
+            </div>
             <button
+              type="button"
               onClick={handleSignup}
               className="submit-button signup-button"
             >

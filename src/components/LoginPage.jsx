@@ -5,6 +5,7 @@ import PasswordInput from './PasswordInput';
 import SubmitButton from './SubmitButton';
 import SwitchLink from './SwitchLink';
 import authService from '../services/auth.service';
+import LoginRoleSelector from './LoginRoleSelector';
 
 function LoginPage({ setPage }) {
   const [userName, setUserName] = useState('');
@@ -12,6 +13,12 @@ function LoginPage({ setPage }) {
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const [selectedRole, setSelectedRole] = useState(null);
+
+  const handleRoleSelect = (role) => {
+    setSelectedRole(role);
+    console.log('Selected role:', role);
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -22,12 +29,30 @@ function LoginPage({ setPage }) {
     }
 
     try {
-      let response;
+      if(selectedRole ==="admin"){
+        let response;
       const headers = { 'Content-Type': 'application/json' };
 
-      await authService.login(userName,password)
+      await authService.AdminLogin(userName,password)
 
       navigate('/AdminDashboard', { replace: true });
+      }
+      else if(selectedRole ==="book_owner"){
+        let response;
+      const headers = { 'Content-Type': 'application/json' };
+
+      await authService.BookOwnerLogin(userName,password)
+
+      navigate('/ProfilePage', { replace: true });
+      }
+      else if(selectedRole ==="reader"){
+        let response;
+      const headers = { 'Content-Type': 'application/json' };
+
+      await authService.ReaderLogin(userName,password)
+
+      navigate('/ProfilePage', { replace: true });
+      }
     } catch (err) {
       console.error('Login error:', err);
       setError(err.message || 'Login failed. Please check your network or server configuration.');
@@ -37,6 +62,7 @@ function LoginPage({ setPage }) {
   return (
     <div className="form-container">
       <h2 className="form-title">Login to Bookstore</h2>
+      <LoginRoleSelector onSelect={handleRoleSelect}/>
       {error && <p className="error-text">{error}</p>}
       <div>
         <UsernameInput
