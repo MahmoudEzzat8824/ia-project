@@ -1,4 +1,5 @@
 import website_logo from '../assets/website_logo.png';
+import authService from '../services/auth.service';
 
 function TopBar() {
     return (
@@ -9,6 +10,7 @@ function TopBar() {
                 <input type="text" className="search-input" placeholder="Search..." />
                 <span className="search-icon">🔍</span>
             </div>
+            <a className='logoutButton' href='/' onClick={authService.Logout}>Log Out</a>
             <img src={website_logo} alt="BookSwap logo" className="web_logo" />
         </div>
     );

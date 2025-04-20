@@ -230,7 +230,7 @@
 }
 
 .TopBarProfilePageLink {
-  font-size: 30px;
+  font-size: 25px;
   color: white;
   text-decoration: none;
   display: flex;
@@ -329,4 +329,19 @@
   background-color: #4caf50;
   color: white;
   border-color: #4caf50;
+}
+
+.logoutButton{
+  font-size: 24px;
+  color: white;
+  text-decoration: none;
+  display: flex;
+  transition: color 0.3s ease;
+  margin: 5px;
+  align-items: center;
+  text-decoration: underline;
+}
+
+.logoutButton:hover {
+  color: #0056b3;
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState , useEffect} from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import UsernameInput from './UsernameInput';
 import PasswordInput from './PasswordInput';
@@ -14,6 +14,25 @@ function LoginPage({ setPage }) {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const [selectedRole, setSelectedRole] = useState(null);
+
+  useEffect(() => {
+    const stored = localStorage.getItem('token');
+    if (stored) {
+      try {
+        const { token, role } = JSON.parse(stored);
+        if (token) {
+          if (role === 'admin') {
+            navigate('/AdminDashboard', { replace: true });
+          } else {
+            navigate('/ProfilePage', { replace: true });
+          }
+        }
+      } catch (err) {
+        console.error('Error reading token:', err);
+        localStorage.removeItem('token');
+      }
+    }
+  }, [navigate]);
 
   const handleRoleSelect = (role) => {
     setSelectedRole(role);
@@ -35,7 +54,7 @@ function LoginPage({ setPage }) {
 
       await authService.AdminLogin(userName,password)
 
-      navigate('/AdminDashboard', { replace: true });
+      window.open('/AdminDashboard',"_blank")
       }
       else if(selectedRole ==="book_owner"){
         let response;
@@ -43,7 +62,7 @@ function LoginPage({ setPage }) {
 
       await authService.BookOwnerLogin(userName,password)
 
-      navigate('/ProfilePage', { replace: true });
+      window.open('/ProfilePage',"_blank")
       }
       else if(selectedRole ==="reader"){
         let response;
@@ -51,7 +70,7 @@ function LoginPage({ setPage }) {
 
       await authService.ReaderLogin(userName,password)
 
-      navigate('/ProfilePage', { replace: true });
+      window.open('/ProfilePage',"_blank")
       }
     } catch (err) {
       console.error('Login error:', err);

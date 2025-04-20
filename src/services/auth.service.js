@@ -10,7 +10,13 @@ const AdminLogin = (adminName, passwordHash) => {
     })
     .then((response) => {
       if (response.data.token) {
-        localStorage.setItem("token", JSON.stringify(response.data));
+        localStorage.setItem(
+          "token",
+          JSON.stringify({
+            token: response.data.token,
+            role: "admin"
+          })
+        );
       }
       return response.data;
     })
@@ -20,7 +26,6 @@ const AdminLogin = (adminName, passwordHash) => {
     });
 };
 
-
 const BookOwnerLogin = (bookOwnerName, password) => {
   return axios
     .post(`${API_URL}/api/bookowner/login`, {
@@ -29,7 +34,13 @@ const BookOwnerLogin = (bookOwnerName, password) => {
     })
     .then((response) => {
       if (response.data.token) {
-        localStorage.setItem("token", JSON.stringify(response.data));
+        localStorage.setItem(
+          "token",
+          JSON.stringify({
+            token: response.data.token,
+            role: "book_owner"
+          })
+        );
       }
       return response.data;
     })
@@ -47,7 +58,13 @@ const ReaderLogin = (readerName, password) => {
     })
     .then((response) => {
       if (response.data.token) {
-        localStorage.setItem("token", JSON.stringify(response.data));
+        localStorage.setItem(
+          "token",
+          JSON.stringify({
+            token: response.data.token,
+            role: "reader"
+          })
+        );
       }
       return response.data;
     })
@@ -57,11 +74,15 @@ const ReaderLogin = (readerName, password) => {
     });
 };
 
+const Logout = () =>{
+  localStorage.removeItem("token");
+};
 
 const authService = {
   AdminLogin,
   BookOwnerLogin,
   ReaderLogin,
+  Logout,
 };
 
 export default authService;
