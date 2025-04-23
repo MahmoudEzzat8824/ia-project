@@ -170,6 +170,27 @@
   background-color: #003d80;
 }
 
+.book_post_button {
+  position: fixed; 
+  top: 120px; 
+  right: 25px; 
+  background-color: #0056b3;
+  color: white;
+  width: 80px; 
+  height: 40px; 
+  border: none;
+  border-radius: 15px; 
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer; 
+}
+
+.book_post_button {
+  background-color: #003d80;
+}
+
 .UserNameAtEditProfile{
   display: inline-block;
   font-size: xx-large;

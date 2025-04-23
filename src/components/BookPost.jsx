@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import authService from '../services/auth.service';
 
-function BookPost() {
+function BookPost({ bookOwnerName }) {
   const [title, setTitle] = useState('');
   const [genre, setGenre] = useState('');
   const [isbn, setIsbn] = useState('');
@@ -13,6 +15,28 @@ function BookPost() {
   const [coverPhoto, setCoverPhoto] = useState(null);
   const [error, setError] = useState('');
   const [coverPhotoPreview, setCoverPhotoPreview] = useState('');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const stored = localStorage.getItem('token');
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        console.log('BookPost localStorage:', parsed);
+        const { token, role, bookOwnerId } = parsed;
+        if (!token || role !== 'book_owner' || !bookOwnerId) {
+          throw new Error('Invalid authentication data: token, role, or bookOwnerId missing');
+        }
+      } catch (err) {
+        console.error('Error reading token:', err);
+        authService.Logout();
+        navigate('/login', { replace: true });
+      }
+    } else {
+      console.error('No token found in localStorage');
+      navigate('/login', { replace: true });
+    }
+  }, [navigate]);
 
   const validateForm = () => {
     if (!title || !genre || !isbn || !description || !language || !publicationDate || !startDate || !endDate || !price || !coverPhoto) {
@@ -51,14 +75,79 @@ function BookPost() {
     }
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      if (isbn === '978-0743273565') {
-        throw new Error('ISBN already exists');
+      const stored = localStorage.getItem('token');
+      if (!stored) {
+        throw new Error('No authentication token found');
       }
-      alert('Book post submitted successfully (mock response)');
+      const parsed = JSON.parse(stored);
+      const token = parsed.token;
+      const bookOwnerId = parsed.bookOwnerId;
+      console.log('Submitting book post with:', { token, bookOwnerId });
+
+      if (!token) {
+        throw new Error('Authentication token is missing');
+      }
+      if (!bookOwnerId) {
+        throw new Error('BookOwnerID is missing from authentication data');
+      }
+
+      const formData = new FormData();
+      formData.append('bookOwnerID', bookOwnerId);
+      formData.append('title', title);
+      formData.append('genre', genre);
+      formData.append('isbn', isbn);
+      formData.append('description', description);
+      formData.append('language', language);
+      formData.append('publicationDate', publicationDate);
+      formData.append('startDate', startDate);
+      formData.append('endDate', endDate);
+      formData.append('price', price);
+      if (coverPhoto) {
+        formData.append('coverPhoto', coverPhoto);
+      }
+
+      const response = await fetch('https://localhost:7200/api/bookowner', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const contentType = response.headers.get('content-type');
+        let errorMessage = `Request failed with status ${response.status}`;
+        if (contentType && contentType.includes('application/json')) {
+          const errorData = await response.json();
+          errorMessage = errorData.message || JSON.stringify(errorData.errors) || errorMessage;
+        } else {
+          const text = await response.text();
+          errorMessage = text || errorMessage;
+        }
+        throw new Error(errorMessage);
+      }
+
+      const contentType = response.headers.get('content-type');
+      let result = 'Book post created successfully';
+      if (contentType && contentType.includes('application/json')) {
+        const data = await response.json();
+        result = data.message || result;
+      } else {
+        const text = await response.text();
+        result = text || result;
+      }
+
       handleAbort();
+      setError('');
+      alert(result);
+      navigate('/BookOwnerPage', { replace: true });
     } catch (err) {
-      setError(err.message || 'Submission failed');
+      console.error('Error submitting book post:', err);
+      setError(err.message || 'Failed to submit book post');
+      if (err.message.includes('401') || err.message.includes('403')) {
+        authService.Logout();
+        navigate('/login', { replace: true });
+      }
     }
   };
 
