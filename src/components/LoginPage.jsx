@@ -62,7 +62,7 @@ function LoginPage({ setPage }) {
 
       await authService.BookOwnerLogin(userName,password)
 
-      window.open('/ProfilePage',"_blank")
+      window.open('/BookOwnerPage ',"_blank")
       }
       else if(selectedRole ==="reader"){
         let response;

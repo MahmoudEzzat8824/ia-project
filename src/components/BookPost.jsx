@@ -21,20 +21,18 @@ function BookPost({ bookOwnerName }) {
     const stored = localStorage.getItem('token');
     if (stored) {
       try {
-        const parsed = JSON.parse(stored);
-        console.log('BookPost localStorage:', parsed);
-        const { token, role, bookOwnerId } = parsed;
-        if (!token || role !== 'book_owner' || !bookOwnerId) {
-          throw new Error('Invalid authentication data: token, role, or bookOwnerId missing');
+        const { token, role } = JSON.parse(stored);
+        if (token) {
+          if (role === 'book_owner') {
+            navigate('/BookPost', { replace: true });
+          } else {
+            navigate('/', { replace: true });
+          }
         }
       } catch (err) {
         console.error('Error reading token:', err);
-        authService.Logout();
-        navigate('/login', { replace: true });
+        localStorage.removeItem('token');
       }
-    } else {
-      console.error('No token found in localStorage');
-      navigate('/login', { replace: true });
     }
   }, [navigate]);
 
@@ -69,11 +67,11 @@ function BookPost({ bookOwnerName }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
+  
     if (!validateForm()) {
       return;
     }
-
+  
     try {
       const stored = localStorage.getItem('token');
       if (!stored) {
@@ -81,18 +79,19 @@ function BookPost({ bookOwnerName }) {
       }
       const parsed = JSON.parse(stored);
       const token = parsed.token;
-      const bookOwnerId = parsed.bookOwnerId;
-      console.log('Submitting book post with:', { token, bookOwnerId });
-
+      const bookOwnerID = parsed.bookOwnerID; // Fix: Use bookOwnerID (capital 'ID')
+      console.log('Submitting book post with:', { token, bookOwnerID });
+  
       if (!token) {
         throw new Error('Authentication token is missing');
       }
-      if (!bookOwnerId) {
-        throw new Error('BookOwnerID is missing from authentication data');
+  
+      if (!bookOwnerID) {
+        throw new Error('Book Owner ID is missing');
       }
-
+  
       const formData = new FormData();
-      formData.append('bookOwnerID', bookOwnerId);
+      formData.append('bookOwnerID', bookOwnerID); // Use bookOwnerID
       formData.append('title', title);
       formData.append('genre', genre);
       formData.append('isbn', isbn);
@@ -105,7 +104,7 @@ function BookPost({ bookOwnerName }) {
       if (coverPhoto) {
         formData.append('coverPhoto', coverPhoto);
       }
-
+  
       const response = await fetch('https://localhost:7200/api/bookowner', {
         method: 'POST',
         headers: {
@@ -113,7 +112,7 @@ function BookPost({ bookOwnerName }) {
         },
         body: formData,
       });
-
+  
       if (!response.ok) {
         const contentType = response.headers.get('content-type');
         let errorMessage = `Request failed with status ${response.status}`;
@@ -126,7 +125,7 @@ function BookPost({ bookOwnerName }) {
         }
         throw new Error(errorMessage);
       }
-
+  
       const contentType = response.headers.get('content-type');
       let result = 'Book post created successfully';
       if (contentType && contentType.includes('application/json')) {
@@ -136,7 +135,7 @@ function BookPost({ bookOwnerName }) {
         const text = await response.text();
         result = text || result;
       }
-
+  
       handleAbort();
       setError('');
       alert(result);
@@ -174,7 +173,7 @@ function BookPost({ bookOwnerName }) {
         <div className="input-group">
           <label className="input-label">Title</label>
           <input
-            type="text"
+            type="tesxt"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="input-field"
