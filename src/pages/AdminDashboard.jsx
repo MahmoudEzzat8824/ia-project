@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TopBar from '../components/top_bar';
+import PendingBookPost from '../components/PendingBookPost';
 
 const AdminDashboard = () => {
   const [bookOwners, setBookOwners] = useState([]);
@@ -43,9 +44,7 @@ const AdminDashboard = () => {
 
         <div>
           <h2 className="text-2xl font-semibold text-gray-700 mb-4">Pending Book Posts</h2>
-          {bookPosts.filter(post => post.status === 'pending').length === 0 && (
-            <p className="text-gray-600 text-center">No pending book posts to review.</p>
-          )}
+          <PendingBookPost />
         </div>
       </div>
     </div>
