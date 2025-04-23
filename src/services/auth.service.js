@@ -72,8 +72,62 @@ const ReaderLogin = async (readerName, password) => {
   }
 };
 
-const Logout = () =>{
+const Logout = () => {
   localStorage.removeItem("token");
+};
+
+const fetchBookOwners = async () => {
+  try {
+    const token = JSON.parse(localStorage.getItem("token"))?.token;
+    if (!token) {
+      throw new Error("No token found");
+    }
+
+    const response = await axios.get(`${API_URL}/api/admin/ManageBookOwners`, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Fetch Book Owners API error:", error);
+    throw error;
+  }
+};
+
+const handleAction = async (id, action) => {
+  try {
+    const token = JSON.parse(localStorage.getItem("token"))?.token;
+    if (!token) {
+      throw new Error("No token found");
+    }
+
+    await axios.put(
+      `${API_URL}/api/admin/ProcessBookOwner/${id}?action=${action}`,
+      null,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    // Refetch book owners after the action
+    const updatedResponse = await axios.get(`${API_URL}/api/admin/ManageBookOwners`, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return updatedResponse.data;
+  } catch (error) {
+    console.error(`Process Book Owner API error (${action}):`, error);
+    throw error;
+  }
 };
 
 const authService = {
@@ -81,6 +135,8 @@ const authService = {
   BookOwnerLogin,
   ReaderLogin,
   Logout,
+  fetchBookOwners,
+  handleAction,
 };
 
 export default authService;
