@@ -55,6 +55,7 @@ function LoginPage({ setPage }) {
       await authService.AdminLogin(userName,password)
 
       window.open('/AdminDashboard',"_blank")
+      window.close();
       }
       else if(selectedRole ==="book_owner"){
         let response;
@@ -63,6 +64,7 @@ function LoginPage({ setPage }) {
       await authService.BookOwnerLogin(userName,password)
 
       window.open('/BookOwnerPage ',"_blank")
+      window.close();
       }
       else if(selectedRole ==="reader"){
         let response;
@@ -71,6 +73,7 @@ function LoginPage({ setPage }) {
       await authService.ReaderLogin(userName,password)
 
       window.open('/ProfilePage',"_blank")
+      window.close();
       }
     } catch (err) {
       console.error('Login error:', err);

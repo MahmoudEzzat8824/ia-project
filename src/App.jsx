@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import BookPost from './components/BookPost';
@@ -7,6 +6,7 @@ import ProfilePage from './pages/ProfilePage';
 import EditProfilePage from './pages/EditProfilePage';
 import AdminDashboard from './pages/AdminDashboard';
 import BookOwnerPage from './pages/BookOwnerPage';
+import Search from './components/search';
 import HomePageWithoutLogin from './pages/HomePageWithoutLogin';
 import BookDetailsPage from './pages/BookDetailsPage';
 
@@ -24,6 +24,7 @@ function App() {
         <Route path="/EditProfilePage" element={<EditProfilePage />} />
         <Route path="/AdminDashboard" element={<AdminDashboard />} />
         <Route path="/BookOwnerPage" element={<BookOwnerPage />} />
+        <Route path="/Search" element={<Search />} />
         <Route path='/HomePageWithoutLogin' element={<HomePageWithoutLogin />} />
         <Route path="/book/:id" element={<BookDetailsPage />} />
       </Routes>

@@ -1,7 +1,8 @@
 @tailwind base;
-@tailwind pages;
+@tailwind components;
 @tailwind utilities;
 
+/* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -22,12 +23,18 @@
   }
 }
 
+/* General App Styles */
 .app-container {
-  @apply min-h-screen bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 flex items-center justify-center;
+  @apply min-h-screen bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100;
+}
+
+/* Login Page Styles */
+.login-page {
+  @apply min-h-screen bg-purple-50 bg-cover bg-center bg-no-repeat flex items-center justify-center;
 }
 
 .form-container {
-  @apply w-full max-w-md bg-white rounded-2xl shadow-xl p-8 transform transition-all duration-300 hover:scale-105;
+  @apply max-w-md bg-white shadow-xl p-8 transition-all hover:scale-105 ml-96 mt-20;
 }
 
 .form-title {
@@ -102,6 +109,7 @@
   animation: pulse 1.5s infinite;
 }
 
+/* Top Bar Styles */
 .top_bar {
   width: 100%;
   height: 100px;
@@ -111,7 +119,7 @@
   align-items: center;
   padding: 0 20px;
   position: relative;
-  justify-content: space-between; /* Ensures elements are spaced appropriately */
+  justify-content: space-between;
 }
 
 .website_name {
@@ -131,123 +139,12 @@
   color: #0056b3;
 }
 
-
 .web_logo {
   border-radius: 10px;
   height: 70px;
   width: 100px;
   display: flex;
   align-self: center;
-}
-
-.username{
-  font-size: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center; 
-  margin: 0; 
-}
-
-
-.edit_profile_button {
-  position: fixed; 
-  top: 120px; 
-  right: 25px; 
-  background-color: #0056b3;
-  color: white;
-  width: 80px; 
-  height: 40px; 
-  border: none;
-  border-radius: 15px; 
-  text-align: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer; 
-}
-
-.edit_profile_button:hover {
-  background-color: #003d80;
-}
-
-.book_post_button {
-  position: fixed; 
-  top: 120px; 
-  right: 25px; 
-  background-color: #0056b3;
-  color: white;
-  width: 80px; 
-  height: 40px; 
-  border: none;
-  border-radius: 15px; 
-  text-align: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer; 
-}
-
-.book_post_button {
-  background-color: #003d80;
-}
-
-.UserNameAtEditProfile{
-  display: inline-block;
-  font-size: xx-large;
-  margin-top: 50px;
-}
-
-.EditButton{
-  display: inline-block;
-  font-size: x-large;
-  margin-left: 25px;
-  width: 75px;
-  border-radius: 5px;
-  background-color: #003d80;
-  color: white;
-}
-.EditButton:hover{
-  background-color: #0056b3;
-}
-
-.PasswordAtEditProfile{
-  display: inline-block;
-  font-size: xx-large;
-  margin-top: 50px;
-}
-.EmailAtEditProfile{
-  display: inline-block;
-  font-size: xx-large;
-  margin-top: 50px;
-}
-.PhoneNumberAtEditProfile{
-  display: inline-block;
-  font-size: xx-large;
-  margin-top: 50px;
-}
-
-.editProfileTextBox{
-  margin-left: 5px;
-  width: 200px;
-  height: 30px;
-  padding: 10px;
-  font-size: 16px;
-  color: #333;
-  background-color: #fff;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-.SaveEditButton{
-  margin-left: 20px;
-  border-radius: 5px;
-  width: 50px;
-  background-color:#14ace8;
-  color: white;
-}
-
-.SaveEditButton:hover{
-  background-color: #003d80;
 }
 
 .TopBarProfilePageLink {
@@ -265,12 +162,28 @@
   color: #0056b3;
 }
 
+.logoutButton {
+  font-size: 24px;
+  color: white;
+  text-decoration: none;
+  display: flex;
+  transition: color 0.3s ease;
+  margin: 5px;
+  align-items: center;
+  text-decoration: underline;
+}
+
+.logoutButton:hover {
+  color: #0056b3;
+}
+
+/* Search Bar Styles */
 .search-container {
   position: relative;
   width: 350px;
   display: flex;
   align-items: center;
-  margin-right: 20px; /* Space between search bar and logo */
+  margin-right: 20px;
 }
 
 .search-input {
@@ -284,7 +197,6 @@
   outline: none;
   transition: all 0.3s ease;
 }
-
 
 .search-input:focus {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
@@ -305,14 +217,16 @@
 .search-icon:hover {
   color: #1e3c72;
 }
+
+/* Media Queries for Responsive Design */
 @media (max-width: 600px) {
   .search-container {
-    width: 200px; /* Smaller search bar on small screens */
+    width: 200px;
   }
 
   .website_name,
   .TopBarProfilePageLink {
-    font-size: 24px; /* Slightly smaller font */
+    font-size: 24px;
   }
 
   .web_logo {
@@ -321,6 +235,7 @@
   }
 }
 
+/* Role Selector Styles */
 .role-selector {
   display: flex;
   justify-content: center;
@@ -352,21 +267,113 @@
   border-color: #4caf50;
 }
 
-.logoutButton{
-  font-size: 24px;
-  color: white;
-  text-decoration: none;
+/* Username and Button Styles */
+.username {
+  font-size: 50px;
   display: flex;
-  transition: color 0.3s ease;
-  margin: 5px;
   align-items: center;
-  text-decoration: underline;
+  justify-content: center;
+  margin: 0;
 }
 
-.logoutButton:hover {
-  color: #0056b3;
+.edit_profile_button {
+  position: fixed;
+  top: 170px;
+  right: 25px;
+  background-color: #0056b3;
+  color: white;
+  width: 80px;
+  height: 60px;
+  border: none;
+  border-radius: 15px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
+.edit_profile_button:hover {
+  background-color: #003d80;
+}
+
+.book_post_button {
+  position: fixed;
+  top: 120px;
+  right: 25px;
+  background-color: #0056b3;
+  color: white;
+  width: 80px;
+  height: 40px;
+  border: none;
+  border-radius: 15px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.book_post_button:hover {
+  background-color: #003d80;
+}
+
+/* Edit Profile Page Styles */
+.UserNameAtEditProfile {
+  display: inline-block;
+  font-size: xx-large;
+  margin-top: 50px;
+}
+
+.EditButton {
+  display: inline-block;
+  font-size: x-large;
+  margin-left: 25px;
+  width: 75px;
+  border-radius: 5px;
+  background-color: #003d80;
+  color: white;
+}
+
+.EditButton:hover {
+  background-color: #0056b3;
+}
+
+.PasswordAtEditProfile,
+.EmailAtEditProfile,
+.PhoneNumberAtEditProfile {
+  display: inline-block;
+  font-size: xx-large;
+  margin-top: 50px;
+}
+
+.editProfileTextBox {
+  margin-left: 5px;
+  width: 200px;
+  height: 30px;
+  padding: 10px;
+  font-size: 16px;
+  color: #333;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.SaveEditButton {
+  margin-left: 20px;
+  border-radius: 5px;
+  width: 50px;
+  background-color: #14ace8;
+  color: white;
+}
+
+.SaveEditButton:hover {
+  background-color: #003d80;
+}
+
+/* Book Posts Container Styles */
 .pending-book-posts-container {
   display: grid;
   grid-template-columns: 1fr;
@@ -437,6 +444,128 @@
   grid-column: span 3;
 }
 
+/* Borrow Requests Styles (Previously BookOwnerPage.css) */
+.borrow-requests {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 1rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.borrow-requests h2 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.request-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.request-item {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.request-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: nowrap;
+}
+
+.request-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column; /* Changed back to column for the new layout */
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.book-title {
+  margin: 5px 0;
+  color: #2c3e50;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.book-isbn {
+  margin: 5px 0;
+  color: #555;
+}
+
+.book-price {
+  margin: 5px 0;
+  color: #555;
+}
+
+.request-subitem {
+  margin-top: 10px;
+  padding-left: 20px;
+  border-left: 2px solid #ddd;
+}
+
+.reader-name {
+  margin: 5px 0;
+  color: #7f8c8d;
+  font-style: italic;
+}
+
+.status {
+  margin: 5px 0;
+  font-weight: bold;
+}
+
+.status-accepted {
+  color: #4CAF50; /* Green for Accepted */
+}
+
+.status-rejected {
+  color: #f44336; /* Red for Rejected */
+}
+
+.status-default {
+  color: #3c3fe7; /* Default color for Pending, Returned/Available, etc. */
+}
+
+.no-requests {
+  margin: 5px 0;
+  color: #666;
+  font-style: italic;
+}
+
+.no-posts {
+  font-style: italic;
+  color: #666;
+  text-align: center;
+}
+
+.loading {
+  text-align: center;
+  font-size: 1rem;
+  color: #666;
+  margin: 1rem 0;
+}
+
+.error {
+  text-align: center;
+  font-size: 1rem;
+  color: #d32f2f;
+  margin: 1rem 0;
+  padding: 0.5rem;
+  background-color: #ffebee;
+  border-radius: 4px;
+}
+
 .action-buttons {
   display: flex;
   justify-content: center;
@@ -444,7 +573,8 @@
   margin-top: 10px;
 }
 
-.approve-button, .reject-button {
+.approve-button,
+.reject-button {
   padding: 8px 16px;
   border: none;
   border-radius: 4px;
@@ -469,6 +599,47 @@
 
 .reject-button:hover {
   background-color: #da190b;
+}
+
+/* Additional Profile Page Styles */
+.return-button {
+  padding: 0.5rem 1rem;
+  background-color: #d32f2f;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+.return-button:hover {
+  background-color: #b71c1c;
+}
+
+details {
+  margin: 1rem 0;
+  padding: 0.5rem;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+summary {
+  cursor: pointer;
+  font-weight: bold;
+  color: #333;
+}
+
+pre {
+  white-space: pre-wrap;
+  font-size: 0.85rem;
+  color: #444;
+  background-color: #eee;
+  padding: 0.5rem;
+  border-radius: 4px;
+  max-height: 300px;
+  overflow-y: auto;
 }
 
 .main-page {
