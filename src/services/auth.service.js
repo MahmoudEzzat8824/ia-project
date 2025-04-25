@@ -256,6 +256,91 @@ const fetchBookPostsByOwner = async (bookOwnerID, signal) => {
   }
 };
 
+const fetchBookPosts = async (bookOwnerID, signal) => {
+  try {
+    const token = JSON.parse(localStorage.getItem("token"))?.token;
+    if (!token) {
+      throw new Error("No token found");
+    }
+
+    const response = await axios.get(`${API_URL}/api/bookowner/posts/${bookOwnerID}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      signal,
+    });
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const acceptRequest = async (requestId, bookPostId, readerId) => {
+  try {
+    const token = JSON.parse(localStorage.getItem("token"))?.token;
+    if (!token) {
+      throw new Error("No token found");
+    }
+
+    const response = await axios.post(
+      `${API_URL}/api/bookowner/respond`,
+      {
+        requsetID: requestId,
+        bookPostID: bookPostId,
+        readerID: readerId,
+        RequsetStatus: "Accepted" // Changed to match the server's expected field name
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      throw new Error(`Request failed with status code ${error.response.status}: ${JSON.stringify(error.response.data)}`);
+    }
+    throw error;
+  }
+};
+
+const rejectRequest = async (requestId, bookPostId, readerId) => {
+  try {
+    const token = JSON.parse(localStorage.getItem("token"))?.token;
+    if (!token) {
+      throw new Error("No token found");
+    }
+
+    const response = await axios.post(
+      `${API_URL}/api/bookowner/respond`,
+      {
+        requsetID: requestId,
+        bookPostID: bookPostId,
+        readerID: readerId,
+        RequsetStatus: "Rejected" // Changed to match the server's expected field name
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      throw new Error(`Request failed with status code ${error.response.status}: ${JSON.stringify(error.response.data)}`);
+    }
+    throw error;
+  }
+};
+
 const authService = {
   AdminLogin,
   BookOwnerLogin,
@@ -268,6 +353,9 @@ const authService = {
   fetchBorrowRequests,
   returnBook,
   fetchBookPostsByOwner,
+  fetchBookPosts,
+  acceptRequest,
+  rejectRequest,
 };
 
 export default authService;
