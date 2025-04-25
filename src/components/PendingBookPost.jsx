@@ -34,38 +34,36 @@ function PendingBookPost() {
     try {
       const storedToken = JSON.parse(localStorage.getItem("token"));
       const token = storedToken?.token;
-
+  
       if (!token) {
         console.error("No token found");
         return;
       }
-
+  
       if (!id) {
         console.error("Invalid post ID:", id);
         return;
       }
-
-      // Capitalize the action to match potential server expectations
-      const actionValue = action.charAt(0).toUpperCase() + action.slice(1); // "approve" -> "Approve"
-
+  
+      const actionValue = action.toLowerCase(); // Match what's expected by the API
+  
       await axios.put(
-        `https://localhost:7200/api/admin/ProcessBookPosts/${id}`,
-        { action: actionValue }, // Send as { "action": "Approve" } or { "action": "Reject" }
+        `https://localhost:7200/api/admin/ProcessBookPosts/${id}?action=${actionValue}`,
+        null, // No body is required
         {
           headers: {
             'accept': '*/*',
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
+            'Authorization': `Bearer ${token}`
           }
         }
       );
-
+  
       // Remove the processed post from the state
       setBookPosts(bookPosts.filter(post => post.bookPostID !== id));
     } catch (error) {
       console.error(`Error ${action}ing post:`, error);
       if (error.response) {
-        console.error('Response data:', error.response.data); // Log the full response data
+        console.error('Response data:', error.response.data);
         console.error('Response status:', error.response.status);
         console.error('Response headers:', error.response.headers);
       } else if (error.request) {
@@ -75,6 +73,7 @@ function PendingBookPost() {
       }
     }
   };
+  
 
   return (
     <div className="pending-book-posts-container">

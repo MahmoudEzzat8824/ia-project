@@ -61,7 +61,8 @@ const ReaderLogin = async (readerName, password) => {
         "token",
         JSON.stringify({
           token: response.data.token,
-          role: "reader"
+          role: "reader",
+          readerID : response.data.user.readerID
         })
       );
     }
