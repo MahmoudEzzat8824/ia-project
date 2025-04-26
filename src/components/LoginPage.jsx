@@ -57,7 +57,7 @@ function LoginPage({ setPage }) {
       window.open('/AdminDashboard',"_blank")
       window.close();
       }
-      else if(selectedRole ==="book_owner"){
+      if(selectedRole ==="book_owner"){
         let response;
       const headers = { 'Content-Type': 'application/json' };
 
@@ -66,7 +66,7 @@ function LoginPage({ setPage }) {
       window.open('/BookOwnerPage ',"_blank")
       window.close();
       }
-      else if(selectedRole ==="reader"){
+      if (selectedRole ==="reader"){
         let response;
       const headers = { 'Content-Type': 'application/json' };
 

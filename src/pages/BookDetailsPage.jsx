@@ -1,21 +1,44 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import axios from "axios";
 
 const BookDetailsPage = () => {
   const location = useLocation();
-  const book = location.state?.book;
+  const { id } = useParams(); // Get bookPostID from URL
+  const [book, setBook] = useState(location.state?.book || null); // Use state for book
+  const [loading, setLoading] = useState(!location.state?.book); // Load if no state
+  const [error, setError] = useState(null);
 
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
+    if (!book && id) {
+      setLoading(true);
+      axios
+        .get(`https://localhost:7200/api/BookPost/${id}`)
+        .then((res) => {
+          setBook(res.data);
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.error("Error fetching book:", err);
+          setError("Failed to load book details.");
+          setLoading(false);
+        });
+    }
+  }, [book, id]);
+
+  useEffect(() => {
     if (book?.bookPostID) {
       axios
         .get(`https://localhost:7200/api/BookPost/comments/${book.bookPostID}`)
         .then((res) => setComments(res.data))
-        .catch((err) => console.error("Error fetching comments:", err));
+        .catch((err) => {
+          console.error("Error fetching comments:", err);
+          setError("Failed to load comments.");
+        });
     }
   }, [book]);
 
@@ -28,6 +51,9 @@ const BookDetailsPage = () => {
       console.error("No token found in localStorage.");
       return;
     }
+
+    setSubmitting(true);
+    setError(null);
   
     try {
       const parsed = JSON.parse(rawToken);
@@ -65,7 +91,13 @@ const BookDetailsPage = () => {
   
   
 
-  if (!book) return <div>Loading...</div>;
+  if (loading) {
+    return <div className="text-gray-600 text-center p-4">Loading book details...</div>;
+  }
+
+  if (error || !book) {
+    return <div className="text-red-600 text-center p-4">{error || "Book data not found."}</div>;
+  }
 
   const coverSrc = book.coverPhoto
     ? `data:image/jpeg;base64,${book.coverPhoto}`
