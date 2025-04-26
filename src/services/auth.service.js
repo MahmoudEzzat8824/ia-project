@@ -1,6 +1,10 @@
 import axios from "axios";
+import { useState } from "react";
 
 const API_URL = "https://localhost:7200";
+let readerIdToShow = null;
+let readerNameToShow = null;
+let readerEmailToShow = null;
 
 const AdminLogin = async (adminName, passwordHash) => {
   try {
@@ -51,27 +55,31 @@ const BookOwnerLogin = async (bookOwnerName, password) => {
 
 const ReaderLogin = async (readerName, password) => {
   try {
-    const response = await axios
-      .post(`${API_URL}/api/reader/login`, {
-        readerName,
-        password,
-      });
+    const response = await axios.post(`${API_URL}/api/reader/login`, {
+      readerName,
+      password,
+    });
+
     if (response.data.token) {
       localStorage.setItem(
         "token",
         JSON.stringify({
           token: response.data.token,
           role: "reader",
-          readerID : response.data.user.readerID
+          readerID: response.data.user.readerID,
+          readerName: response.data.user.readerName, // Add this
+          readerEmail: response.data.user.email       // Add this
         })
       );
     }
+
     return response.data;
   } catch (error) {
     console.error("Login API error:", error);
     throw error;
   }
 };
+
 
 const Logout = () => {
   localStorage.removeItem("token");
@@ -341,6 +349,8 @@ const rejectRequest = async (requestId, bookPostId, readerId) => {
   }
 };
 
+
+
 const authService = {
   AdminLogin,
   BookOwnerLogin,
@@ -356,6 +366,21 @@ const authService = {
   fetchBookPosts,
   acceptRequest,
   rejectRequest,
+  getReaderDetails: () => {
+    const tokenData = JSON.parse(localStorage.getItem("token"));
+    if (tokenData && tokenData.role === "reader") {
+      return {
+        readerId: tokenData.readerID || null,
+        readerName: tokenData.readerName || null,
+        readerEmail: tokenData.readerEmail || null,
+      };
+    }
+    return {
+      readerId: null,
+      readerName: null,
+      readerEmail: null,
+    };
+  }
 };
 
 export default authService;

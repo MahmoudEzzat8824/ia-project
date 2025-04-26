@@ -1,23 +1,33 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom"; 
 import TopBar from "../components/top_bar";
-import UserInfoCard from "../components/UserInfoCard";
+import UserNotLoggedCard from "../components/UserNotLoggedCard"; 
 import Posts from "../components/Posts";
 
 function HomePageWithoutLogin({ currentUser, books, onLoginClick }) {
-
-    if (localStorage.getItem("token")) {
+  const navigate = useNavigate();
+  
+  if (localStorage.getItem("token")) {
         localStorage.removeItem("token");
     }
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/HomePageWithLogin");
+    }
+  }, [navigate]);
     
-    return (
-        <>
-            <TopBar />
-            <div className="main-page">
-                <UserInfoCard user={currentUser} />
-                <Posts />
-            </div>
-        </>
-    );
+
+  return (
+    <>
+      <TopBar />
+      <div className="main-page">
+        <UserNotLoggedCard />
+        <Posts />
+      </div>
+    </>
+  );
 }
 
 export default HomePageWithoutLogin;

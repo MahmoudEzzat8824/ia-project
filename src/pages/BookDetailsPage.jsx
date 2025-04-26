@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import axios from "axios";
+import HomePageWithoutLogin from "./HomePageWithoutLogin";
 
 const BookDetailsPage = () => {
   const location = useLocation();
@@ -12,6 +13,7 @@ const BookDetailsPage = () => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [userReaction, setUserReaction] = useState(null); // 'like', 'dislike', or null
 
   useEffect(() => {
     if (!book && id) {
@@ -32,6 +34,7 @@ const BookDetailsPage = () => {
 
   useEffect(() => {
     if (book?.bookPostID) {
+      // Fetch comments
       axios
         .get(`https://localhost:7200/api/BookPost/comments/${book.bookPostID}`)
         .then((res) => setComments(res.data))
@@ -39,14 +42,26 @@ const BookDetailsPage = () => {
           console.error("Error fetching comments:", err);
           setError("Failed to load comments.");
         });
+
+      // Fetch user reaction if logged in
+      const rawToken = localStorage.getItem("token");
+      if (rawToken) {
+        const parsed = JSON.parse(rawToken);
+        const readerID = parsed.readerID;
+        axios.get(`https://localhost:7200/api/reader/reaction/${readerID}/${book.bookPostID}`)
+          .then((res) => {
+            if (res.data?.isLike === true) setUserReaction("like");
+            else if (res.data?.isLike === false) setUserReaction("dislike");
+          })
+          .catch((err) => console.error("Error fetching user reaction:", err));
+      }
     }
   }, [book]);
 
   const handleCommentSubmit = async () => {
     if (!newComment.trim()) return;
-  
+
     const rawToken = localStorage.getItem("token");
-  
     if (!rawToken) {
       console.error("No token found in localStorage.");
       return;
@@ -59,7 +74,7 @@ const BookDetailsPage = () => {
       const parsed = JSON.parse(rawToken);
       const token = parsed.token;
       const readerID = parsed.readerID;
-  
+
       const response = await axios.post(
         "https://localhost:7200/api/reader/comment",
         {
@@ -73,7 +88,7 @@ const BookDetailsPage = () => {
           },
         }
       );
-  
+
       setComments((prev) => [
         ...prev,
         {
@@ -82,13 +97,114 @@ const BookDetailsPage = () => {
           content: newComment.trim(),
         },
       ]);
-  
       setNewComment("");
     } catch (error) {
       console.error("Error submitting comment:", error);
     }
   };
+  const handleBorrowBook = async () => {
+    const rawToken = localStorage.getItem("token");
+    if (!rawToken) {
+      console.error("No token found in localStorage.");
+      return;
+    }
   
+    try {
+      const parsed = JSON.parse(rawToken);
+      const token = parsed.token;
+      const readerID = parsed.readerID;
+  
+      await axios.post(
+        "https://localhost:7200/api/reader/borrow",
+        {
+          readerID,
+          bookPostID: book.bookPostID,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      window.location.href = "/HomePageWithoutLogin"; // <-- still inside try block
+    } catch (error) {
+      console.error("Error borrowing book:", error);
+    }
+  };
+  
+
+  const handleLike = async () => {
+    console.log("Like button clicked ✅");
+    const rawToken = localStorage.getItem("token");
+    if (!rawToken || !book) return;
+
+    const parsed = JSON.parse(rawToken);
+    const token = parsed.token;
+    const readerID = parsed.readerID;
+
+    try {
+      if (userReaction === "like") {
+        await axios.delete("https://localhost:7200/api/reader/like", {
+          data: { readerID, bookPostID: book.bookPostID, isLike: true },
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUserReaction(null);
+      } else if (userReaction === "dislike") {
+        await axios.put(
+          "https://localhost:7200/api/reader/like",
+          { readerID, bookPostID: book.bookPostID, isLike: true },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setUserReaction("like");
+      } else {
+        await axios.post(
+          "https://localhost:7200/api/reader/like",
+          { readerID, bookPostID: book.bookPostID, isLike: true },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setUserReaction("like");
+      }
+    } catch (error) {
+      console.error("Error handling like:", error);
+    }
+  };
+
+  const handleDislike = async () => {
+    console.log("Dislike button clicked ✅");
+    const rawToken = localStorage.getItem("token");
+    if (!rawToken || !book) return;
+
+    const parsed = JSON.parse(rawToken);
+    const token = parsed.token;
+    const readerID = parsed.readerID;
+
+    try {
+      if (userReaction === "dislike") {
+        await axios.delete("https://localhost:7200/api/reader/like", {
+          data: { readerID, bookPostID: book.bookPostID, isLike: false },
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUserReaction(null);
+      } else if (userReaction === "like") {
+        await axios.put(
+          "https://localhost:7200/api/reader/like",
+          { readerID, bookPostID: book.bookPostID, isLike: false },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setUserReaction("dislike");
+      } else {
+        await axios.post(
+          "https://localhost:7200/api/reader/like",
+          { readerID, bookPostID: book.bookPostID, isLike: false },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setUserReaction("dislike");
+      }
+    } catch (error) {
+      console.error("Error handling dislike:", error);
+    }
+  };
   
 
   if (loading) {
@@ -125,8 +241,19 @@ const BookDetailsPage = () => {
       </div>
 
       <div className="reactions">
-        <button className="like-button">👍 {book.totalLikes}</button>
-        <button className="dislike-button">👎 {book.totalDislikes}</button>
+      <button 
+  className={`like-button ${userReaction === "like" ? "active" : ""}`}
+  onClick={handleLike}
+>
+  👍 {book.totalLikes}
+</button>
+
+<button 
+  className={`dislike-button ${userReaction === "dislike" ? "active" : ""}`}
+  onClick={handleDislike}
+>
+  👎 {book.totalDislikes}
+</button>
       </div>
 
       <div className="comments-section">
@@ -141,16 +268,18 @@ const BookDetailsPage = () => {
           ))
         )}
         <textarea
-            className="comment-box"
-            placeholder="Write your comment..."
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            rows={3}
-            />
-
-            <button onClick={handleCommentSubmit} className="submit-comment-button">
-            Submit Comment
-            </button>
+          className="comment-box"
+          placeholder="Write your comment..."
+          value={newComment}
+          onChange={(e) => setNewComment(e.target.value)}
+          rows={3}
+        />
+        <button onClick={handleCommentSubmit} className="submit-comment-button">
+          Submit Comment
+        </button>
+        <button className="borrow-book-button" onClick={handleBorrowBook}>
+          Borrow Book
+        </button>
       </div>
     </div>
   );

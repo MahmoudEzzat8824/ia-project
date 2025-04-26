@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 const BookPostCard = ({ book }) => {
   const navigate = useNavigate();
+  const token = localStorage.getItem("token"); // Get token once at the top
 
   const coverSrc = book.coverPhoto
     ? `data:image/jpeg;base64,${book.coverPhoto}`
@@ -23,7 +24,11 @@ const BookPostCard = ({ book }) => {
           <p>👍 {book.totalLikes}</p>
           <p>👎 {book.totalDislikes}</p>
         </div>
-        <button onClick={handleViewDetails} className="details-button">View Details</button>
+        {token && ( // Only show the button if token exists
+          <button onClick={handleViewDetails} className="details-button">
+            View Details
+          </button>
+        )}
       </div>
     </div>
   );
