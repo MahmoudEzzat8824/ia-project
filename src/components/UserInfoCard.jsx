@@ -5,7 +5,7 @@ const UserInfoCard = ({ user }) => {
     return (
       <div className="user-container">
         <p>You are not logged in.</p>
-        <a href="/"><button>Login</button></a>
+        <a href="/login"><button>Login</button></a>
       </div>
     );
   }

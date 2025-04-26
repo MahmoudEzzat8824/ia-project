@@ -26,7 +26,7 @@ function BookPost({ bookOwnerName }) {
           if (role === 'book_owner') {
             navigate('/BookPost', { replace: true });
           } else {
-            navigate('/', { replace: true });
+            navigate('/login', { replace: true });
           }
         }
       } catch (err) {

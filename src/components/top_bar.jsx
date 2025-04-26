@@ -12,7 +12,7 @@ function TopBar() {
                 <div className="flex gap-4">
                     {/* <a className="TopBarProfilePageLink" href="/ProfilePage">Profile</a> */}
                     <a className="TopBarProfilePageLink" href="/search">Search</a>
-                    <a className="logoutButton" href="/" onClick={authService.Logout}>Log Out</a>
+                    <a className="logoutButton" href="/login" onClick={authService.Logout}>Log Out</a>
                 </div>
             </div>
         </div>

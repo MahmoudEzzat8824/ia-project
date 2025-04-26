@@ -136,7 +136,7 @@ function SignupPage({ setPage }) {
 
       console.log('Signup successful, redirecting to login');
       alert(`Signup successful as ${userType === 'bookowner' ? 'Book Owner' : 'Reader'}`);
-      navigate('/', { replace: true });
+      navigate('/login', { replace: true });
     } catch (err) {
       console.error('Signup error:', err);
       setError(err.message || 'Signup failed. Please check your network or server configuration.');
@@ -219,7 +219,7 @@ function SignupPage({ setPage }) {
           </div>
           <p className="switch-text">
             Already have an account?{' '}
-            <Link to="/">
+            <Link to="/login">
               <button className="switch-link signup-link">
                 Login
               </button>

@@ -5,6 +5,9 @@ import Posts from "../components/Posts";
 
 function HomePageWithoutLogin({ currentUser, books, onLoginClick }) {
 
+    if (localStorage.getItem("token")) {
+        localStorage.removeItem("token");
+    }
     
     return (
         <>

@@ -13,14 +13,14 @@ const AdminDashboard = () => {
     const checkAuthorization = () => {
       const storedData = localStorage.getItem("token");
       if (!storedData) {
-        navigate("/");
+        navigate("/login");
         return;
       }
 
       const { token, role } = JSON.parse(storedData);
 
       if (!token) {
-        navigate("/");
+        navigate("/login");
       } else if (role !== "admin") {
         navigate("/ProfilePage");
       }

@@ -17,7 +17,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={<HomePageWithoutLogin />} />
         <Route path="/signup" element={<Signup />} /> 
         <Route path="/bookpost" element={<BookPost />} />
         <Route path="/ProfilePage" element={<ProfilePage />} />
@@ -25,7 +25,7 @@ function App() {
         <Route path="/AdminDashboard" element={<AdminDashboard />} />
         <Route path="/BookOwnerPage" element={<BookOwnerPage />} />
         <Route path="/Search" element={<Search />} />
-        <Route path='/HomePageWithoutLogin' element={<HomePageWithoutLogin />} />
+        <Route path='/login' element={<Login />} />
         <Route path="/book/:id" element={<BookDetailsPage />} />
       </Routes>
     </Router>
