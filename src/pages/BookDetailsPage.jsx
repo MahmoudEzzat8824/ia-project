@@ -126,8 +126,9 @@ const BookDetailsPage = () => {
           },
         }
       );
+      alert("Book borrow requested successfully!");
   
-      window.location.href = "/HomePageWithoutLogin"; // <-- still inside try block
+      window.location.href = "/HomePageWithLogin"; // <-- still inside try block
     } catch (error) {
       console.error("Error borrowing book:", error);
     }

@@ -380,6 +380,21 @@ const authService = {
       readerName: null,
       readerEmail: null,
     };
+  },
+  getBookOwnerDetails: () => {
+    const tokenData = JSON.parse(localStorage.getItem("token"));
+    if (tokenData && tokenData.role === "book_owner") {
+      return {
+        bookOwnerId: tokenData.bookOwnerID || null,
+        bookOwnerName: tokenData.bookOwnerName || null,
+        // readerEmail: tokenData.bookOwnerEmail || null,
+      };
+    }
+    return {
+      bookOwnerId: null,
+      bookOwnerName: null,
+      // readerEmail: null,
+    };
   }
 };
 

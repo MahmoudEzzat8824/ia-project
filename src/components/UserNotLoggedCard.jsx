@@ -4,7 +4,7 @@ function UserNotLoggedCard() {
   return (
     <div className="user-info-card">
       <p>Not logged in</p>
-      <a href="/">Login</a>
+      <a href="/login">Login</a>
     </div>
   );
 }

@@ -72,7 +72,7 @@ function LoginPage({ setPage }) {
 
       await authService.ReaderLogin(userName,password)
 
-      window.open('/ProfilePage',"_blank")
+      window.open('/HomePageWithLogin',"_blank")
       window.close();
       }
     } catch (err) {

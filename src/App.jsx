@@ -27,6 +27,7 @@ function App() {
         <Route path="/Search" element={<Search />} />
         <Route path='/login' element={<Login />} />
         <Route path="/book/:id" element={<BookDetailsPage />} />
+        <Route path="/HomePageWithLogin" element={<HomePageWithLogin />} />
       </Routes>
     </Router>
   );

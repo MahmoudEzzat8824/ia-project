@@ -7,29 +7,45 @@ export default function UserInfoCard() {
     readerName: null,
     readerEmail: null,
   });
+  const [bookOwnerDetails, setBookOwnerDetails] = useState({
+    bookOwnerId: null,
+    bookOwnerName: null,
+  });
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      const details = authService.getReaderDetails();
-      setReaderDetails(details);
-    }, 1000); // refresh every 1 second
+    // Log token for debugging
+    const token = localStorage.getItem("token");
+    console.log("UserInfoCard - token:", token);
 
-    return () => clearInterval(intervalId); // clean up interval when component unmounts
-  }, []);
+    // Fetch details
+    const details = authService.getReaderDetails();
+    const ownerDetails = authService.getBookOwnerDetails();
+    
+    console.log("UserInfoCard - readerDetails:", details);
+    console.log("UserInfoCard - bookOwnerDetails:", ownerDetails);
+
+    setReaderDetails(details);
+    setBookOwnerDetails(ownerDetails);
+
+    // No need for interval unless token changes dynamically
+  }, []); // Run once on mount
 
   return (
     <div className="user-info-card">
-  {readerDetails.readerId ? (
-    <div className="text-xs font-semibold">
-      <p className="username-welcome">Welcome {readerDetails.readerName}</p>
-      <p className="userId-welcome">Your Id is : {readerDetails.readerId}</p> 
-      <p className="useEmailr-welcome">Email : {readerDetails.readerEmail}</p>  
-      
+      {readerDetails.readerId ? (
+        <div className="text-xs font-semibold">
+          <p className="username-welcome">Welcome {readerDetails.readerName}</p>
+          <p className="userId-welcome">Your Id is: {readerDetails.readerId}</p>
+          <p className="useEmailr-welcome">Email: {readerDetails.readerEmail}</p>
+        </div>
+      ) : bookOwnerDetails.bookOwnerId ? (
+        <div className="text-xs font-semibold">
+          <p className="username-welcome">Welcome {bookOwnerDetails.bookOwnerName}</p>
+          <p className="userId-welcome">Your Id is: {bookOwnerDetails.bookOwnerId}</p>
+        </div>
+      ) : (
+        <div className="text-xs font-semibold">Not logged in</div>
+      )}
     </div>
-  ) : (
-    <div className="text-xs font-semibold">Not logged in</div>
-  )}
-</div>
-
   );
 }
