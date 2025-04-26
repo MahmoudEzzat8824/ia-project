@@ -9,7 +9,7 @@ import BookOwnerPage from './pages/BookOwnerPage';
 import Search from './components/search';
 import HomePageWithoutLogin from './pages/HomePageWithoutLogin';
 import BookDetailsPage from './pages/BookDetailsPage';
-
+import HomePageWithLogin from './pages/HomePageWithLogin';
 
 function App() {
 
@@ -26,6 +26,7 @@ function App() {
         <Route path="/BookOwnerPage" element={<BookOwnerPage />} />
         <Route path="/Search" element={<Search />} />
         <Route path='/HomePageWithoutLogin' element={<HomePageWithoutLogin />} />
+        <Route path='/HomePageWithLogin' element={<HomePageWithLogin />} />
         <Route path="/book/:id" element={<BookDetailsPage />} />
       </Routes>
     </Router>

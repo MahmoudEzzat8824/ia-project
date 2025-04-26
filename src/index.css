@@ -810,3 +810,38 @@ pre {
 .details-button:hover {
   background-color: #3a89c9;
 }
+
+.borrow-book-button{
+  margin-top: 10px;
+  margin-left: 10px;
+  padding: 10px 16px;
+  background-color: #4e9bde;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.borrow-book-button:hover {
+  background-color: #3a89c9;
+}
+
+.user-info-card {
+  background-color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.like-button,
+.dislike-button,
+.borrow-book-button,
+.submit-comment-button {
+  cursor: pointer;
+}

@@ -1,36 +1,35 @@
-import React from "react";
+import { useEffect, useState } from "react";
+import authService from "../services/auth.service";
 
-const UserInfoCard = ({ user }) => {
-  if (!user) {
-    return (
-      <div className="user-container">
-        <p>You are not logged in.</p>
-        <a href="/"><button>Login</button></a>
-      </div>
-    );
-  }
+export default function UserInfoCard() {
+  const [readerDetails, setReaderDetails] = useState({
+    readerId: null,
+    readerName: null,
+    readerEmail: null,
+  });
 
-  const { role, user: userInfo } = user;
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      const details = authService.getReaderDetails();
+      setReaderDetails(details);
+    }, 1000); // refresh every 1 second
+
+    return () => clearInterval(intervalId); // clean up interval when component unmounts
+  }, []);
 
   return (
-    <div className="user-container">
-      <h3>Logged in as {role}</h3>
-      {role === "admin" && <p>Admin Name: {userInfo.adminName}</p>}
-      {role === "book_owner" && (
-        <>
-          <p>Name: {userInfo.bookOwnerName}</p>
-          <p>Email: {userInfo.email}</p>
-          <p>Phone: {userInfo.phoneNumber}</p>
-        </>
-      )}
-      {role === "reader" && (
-        <>
-          <p>Name: {userInfo.readerName}</p>
-          <p>Email: {userInfo.email}</p>
-        </>
-      )}
+    <div className="user-info-card">
+  {readerDetails.readerId ? (
+    <div className="text-xs font-semibold">
+      <p className="username-welcome">Welcome {readerDetails.readerName}</p>
+      <p className="userId-welcome">Your Id is : {readerDetails.readerId}</p> 
+      <p className="useEmailr-welcome">Email : {readerDetails.readerEmail}</p>  
+      
     </div>
-  );
-};
+  ) : (
+    <div className="text-xs font-semibold">Not logged in</div>
+  )}
+</div>
 
-export default UserInfoCard;
+  );
+}
