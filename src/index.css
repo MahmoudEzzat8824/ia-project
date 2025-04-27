@@ -845,3 +845,130 @@ pre {
 .submit-comment-button {
   cursor: pointer;
 }
+
+.book-details-page {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 1rem;
+  font-family: 'Arial', sans-serif;
+}
+
+.book-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.book-cover-large {
+  width: 200px;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.book-main-info {
+  flex: 1;
+}
+
+.book-title {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.book-main-info p {
+  margin: 0.4rem 0;
+}
+
+.book-description {
+  margin-top: 2rem;
+}
+
+.book-description h3 {
+  margin-bottom: 0.5rem;
+}
+
+.reactions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.like-button, .dislike-button {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.like-button:hover, .dislike-button:hover {
+  background-color: #e0e0e0;
+}
+
+.like-button.active {
+  background-color: #c8f7c5;
+  border-color: #7ed56f;
+}
+
+.dislike-button.active {
+  background-color: #f7c5c5;
+  border-color: #e27d60;
+}
+
+.comments-section {
+  margin-top: 2rem;
+}
+
+.comments-section h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.comment {
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  background-color: #fafafa;
+}
+
+.reply {
+  margin-top: 0.5rem;
+  padding-left: 1rem;
+  border-left: 2px solid #ccc;
+  font-size: 0.95rem;
+}
+
+textarea {
+  width: 100%;
+  padding: 0.6rem;
+  margin-top: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  resize: vertical;
+}
+
+button.submit-btn {
+  margin-top: 0.5rem;
+  background-color: #4caf50;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button.submit-btn:hover {
+  background-color: #45a049;
+}
+
+.error-message {
+  color: red;
+  margin-top: 1rem;
+}

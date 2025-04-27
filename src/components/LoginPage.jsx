@@ -63,7 +63,7 @@ function LoginPage({ setPage }) {
 
       await authService.BookOwnerLogin(userName,password)
 
-      window.open('/BookOwnerPage ',"_blank")
+      window.open('/HomePageWithLogin ',"_blank")
       window.close();
       }
       if (selectedRole ==="reader"){
