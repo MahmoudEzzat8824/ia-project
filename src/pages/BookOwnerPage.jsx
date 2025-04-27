@@ -34,7 +34,11 @@ function BookOwnerPage() {
 
         const requestsResponse = await authService.fetchBookPostsByOwner(bookOwnerID, controller.signal);
         const requestsArray = requestsResponse?.requests && Array.isArray(requestsResponse.requests) ? requestsResponse.requests : [];
-        setRequests(requestsArray);
+        // Remove duplicates based on bookPostID for requests
+        const uniqueRequests = Array.from(
+          new Map(requestsArray.map(request => [(request.bookPostID || request.bookPostId), request])).values()
+        );
+        setRequests(uniqueRequests);
 
         clearTimeout(timeoutId);
         setLoading(false);

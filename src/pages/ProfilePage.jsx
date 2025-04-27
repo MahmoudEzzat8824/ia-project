@@ -30,7 +30,12 @@ function ProfilePage() {
 
               const requests = Array.isArray(requestsData) ? requestsData : [];
               
-              setBorrowRequests(requests);
+              // Remove duplicates based on bookPostID
+              const uniqueRequests = Array.from(
+                  new Map(requests.map(request => [(request.bookPostID || request.bookPostId), request])).values()
+              );
+              
+              setBorrowRequests(uniqueRequests);
           } catch (err) {
               setError(`Failed to load borrow requests: ${err.message}`);
               console.error("Fetch error:", err);
@@ -44,7 +49,7 @@ function ProfilePage() {
 
   const handleReturnBook = async (requsetID, bookPostID) => {
     try {
-      await authService.returnBook(requsetID, bookPostID, readerId); // Fixed readerID to readerId
+      await authService.returnBook(requsetID, bookPostID, readerId);
       setBorrowRequests(borrowRequests.filter(request => (request.requsetID || request.requestId || request.id) !== requsetID));
     } catch (err) {
       setError(`Failed to return book: ${err.message}`);
@@ -68,15 +73,14 @@ function ProfilePage() {
           {!loading && !error && borrowRequests.length === 0 && (
               <>
                   <p>No borrow requests found.</p>
-                  
               </>
           )}
           {!loading && !error && borrowRequests.length > 0 && (
               <ul className="request-list">
                   {borrowRequests.map((request) => {
-                      console.log("Request Object:", request); // Debug each request object
-                      const status = request.requsetStatus?.toLowerCase(); // Use requsetStatus from schema
-                      const canReturn = status === 'accepted' || status === 'approved'; // Adjust based on actual status values
+                      console.log("Request Object:", request);
+                      const status = request.requsetStatus?.toLowerCase();
+                      const canReturn = status === 'accepted' || status === 'approved';
                       return (
                           <li key={request.requsetID || request.requestId || request.id} className="request-item">
                               <div className="request-details">
@@ -88,8 +92,8 @@ function ProfilePage() {
                                       <button 
                                         className="return-button" 
                                         onClick={() => handleReturnBook(
-                                          request.requsetID || request.requestId || request.id, // Use requsetID from schema
-                                          request.bookPostID || request.bookPostId // Use bookPostID from schema
+                                          request.requsetID || request.requestId || request.id,
+                                          request.bookPostID || request.bookPostId
                                         )}
                                       >
                                         Return Book

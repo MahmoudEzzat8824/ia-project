@@ -20,10 +20,10 @@ const BookPostCard = ({ book }) => {
         <p><strong>Title:</strong> {book.title}</p>
         <p><strong>Genre:</strong> {book.genre}</p>
         <p><strong>Price:</strong> ${book.price}</p>
-        <div className="reactions">
+        {/* <div className="reactions">
           <p>👍 {book.totalLikes}</p>
           <p>👎 {book.totalDislikes}</p>
-        </div>
+        </div> */}
         {token && ( // Only show the button if token exists
           <button onClick={handleViewDetails} className="details-button">
             View Details

@@ -67,8 +67,8 @@ const ReaderLogin = async (readerName, password) => {
           token: response.data.token,
           role: "reader",
           readerID: response.data.user.readerID,
-          readerName: response.data.user.readerName, // Add this
-          readerEmail: response.data.user.email       // Add this
+          readerName: response.data.user.readerName,
+          readerEmail: response.data.user.email
         })
       );
     }
@@ -79,7 +79,6 @@ const ReaderLogin = async (readerName, password) => {
     throw error;
   }
 };
-
 
 const Logout = () => {
   localStorage.removeItem("token");
@@ -124,7 +123,6 @@ const handleAction = async (id, action) => {
       }
     );
 
-    // Refetch book owners after the action
     const updatedResponse = await axios.get(`${API_URL}/api/admin/ManageBookOwners`, {
       headers: {
         'Content-Type': 'application/json',
@@ -146,7 +144,6 @@ const searchBooks = async (searchParams) => {
       throw new Error("No token found");
     }
 
-    // Create query string from non-empty search parameters
     const queryParams = Object.entries(searchParams)
       .filter(([_, value]) => value.trim() !== '')
       .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
@@ -203,7 +200,6 @@ const fetchBorrowRequests = async (readerID) => {
 
     console.log("Raw Borrow Requests API Response:", response.data);
 
-    // Handle different possible response structures
     return Array.isArray(response.data) 
       ? response.data 
       : response.data.borrowRequests || [];
@@ -223,10 +219,10 @@ const returnBook = async (requestID, bookPostID, readerID) => {
     const response = await axios.post(
       `${API_URL}/api/reader/return`,
       {
-        requsetID: requestID, // Use requsetID as per schema
+        requsetID: requestID,
         bookPostID: bookPostID,
         readerID: readerID,
-        requsetStatus: "returned" // Use requsetStatus as per schema
+        requsetStatus: "returned"
       },
       {
         headers: {
@@ -298,7 +294,7 @@ const acceptRequest = async (requestId, bookPostId, readerId) => {
         requsetID: requestId,
         bookPostID: bookPostId,
         readerID: readerId,
-        RequsetStatus: "Accepted" // Changed to match the server's expected field name
+        RequsetStatus: "Accepted"
       },
       {
         headers: {
@@ -330,7 +326,7 @@ const rejectRequest = async (requestId, bookPostId, readerId) => {
         requsetID: requestId,
         bookPostID: bookPostId,
         readerID: readerId,
-        RequsetStatus: "Rejected" // Changed to match the server's expected field name
+        RequsetStatus: "Rejected"
       },
       {
         headers: {
@@ -349,7 +345,116 @@ const rejectRequest = async (requestId, bookPostId, readerId) => {
   }
 };
 
+const addLike = async (readerID, bookPostID, isLike) => {
+  try {
+    const token = JSON.parse(localStorage.getItem("token"))?.token;
+    if (!token) {
+      throw new Error("No token found");
+    }
 
+    const response = await axios.post(
+      `${API_URL}/api/reader/like`,
+      {
+        readerID,
+        bookPostID,
+        isLike
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Add Like API error:", error);
+    throw error;
+  }
+};
+
+const updateLike = async (readerID, bookPostID, isLike) => {
+  try {
+    const token = JSON.parse(localStorage.getItem("token"))?.token;
+    if (!token) {
+      throw new Error("No token found");
+    }
+
+    const response = await axios.put(
+      `${API_URL}/api/reader/like`,
+      {
+        readerID,
+        bookPostID,
+        isLike
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Update Like API error:", error);
+    throw error;
+  }
+};
+
+const removeLike = async (readerID, bookPostID, isLike) => {
+  try {
+    const token = JSON.parse(localStorage.getItem("token"))?.token;
+    if (!token) {
+      throw new Error("No token found");
+    }
+
+    const response = await axios.delete(
+      `${API_URL}/api/reader/like`,
+      {
+        data: {
+          readerID,
+          bookPostID,
+          isLike
+        },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Remove Like API error:", error);
+    throw error;
+  }
+};
+
+const checkLike = async (readerID, bookPostID) => {
+  try {
+    const token = JSON.parse(localStorage.getItem("token"))?.token;
+    if (!token) {
+      throw new Error("No token found");
+    }
+
+    const response = await axios.get(
+      `${API_URL}/api/reader/check-like?readerID=${readerID}&bookPostID=${bookPostID}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Check Like API error:", error);
+    throw error;
+  }
+};
 
 const authService = {
   AdminLogin,
@@ -366,6 +471,10 @@ const authService = {
   fetchBookPosts,
   acceptRequest,
   rejectRequest,
+  addLike,
+  updateLike,
+  removeLike,
+  checkLike,
   getReaderDetails: () => {
     const tokenData = JSON.parse(localStorage.getItem("token"));
     if (tokenData && tokenData.role === "reader") {
@@ -387,13 +496,11 @@ const authService = {
       return {
         bookOwnerId: tokenData.bookOwnerID || null,
         bookOwnerName: tokenData.bookOwnerName || null,
-        // readerEmail: tokenData.bookOwnerEmail || null,
       };
     }
     return {
       bookOwnerId: null,
       bookOwnerName: null,
-      // readerEmail: null,
     };
   }
 };
