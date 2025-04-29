@@ -22,21 +22,26 @@ const BookDetailsPage = () => {
   const [replySubmitting, setReplySubmitting] = useState(false);
 
   useEffect(() => {
-    if (!book && id) {
+    console.log('BookDetailsPage - id:', id, 'state.book:', location.state?.book);
+    if (!book && id && id !== "undefined") {
       setLoading(true);
       axios
         .get(`https://localhost:7200/api/BookPost/${id}`)
         .then((res) => {
+          console.log('BookDetailsPage - Fetched book:', res.data);
           setBook(res.data);
           setLikes(res.data.totalLikes || 0);
           setDislikes(res.data.totalDislikes || 0);
           setLoading(false);
         })
         .catch((err) => {
-          console.error("Error fetching book:", err);
-          setError("Failed to load book details.");
+          console.error('Error fetching book:', err.response?.data || err.message);
+          setError(`Failed to load book details: ${err.message}`);
           setLoading(false);
         });
+    } else if (!id || id === "undefined") {
+      setError("Invalid book ID. Please select a valid book.");
+      setLoading(false);
     } else if (book) {
       setLikes(book.totalLikes || 0);
       setDislikes(book.totalDislikes || 0);

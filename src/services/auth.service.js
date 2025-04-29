@@ -1,10 +1,7 @@
 import axios from "axios";
-import { useState } from "react";
+
 
 const API_URL = "https://localhost:7200";
-let readerIdToShow = null;
-let readerNameToShow = null;
-let readerEmailToShow = null;
 
 const AdminLogin = async (adminName, passwordHash) => {
   try {
@@ -137,49 +134,56 @@ const handleAction = async (id, action) => {
   }
 };
 
-const searchBooks = async (searchParams) => {
+const searchBooks = async (params) => {
+  const queryParams = Object.entries(params)
+    .filter(([_, value]) => value && value.trim() !== '')
+    .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+    .join('&');
   try {
-    const token = JSON.parse(localStorage.getItem("token"))?.token;
-    if (!token) {
-      throw new Error("No token found");
-    }
-
-    const queryParams = Object.entries(searchParams)
-      .filter(([_, value]) => value.trim() !== '')
-      .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
-      .join('&');
-
-    const response = await axios.get(`${API_URL}/api/BookPost/Search?${queryParams}`, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
+    const token = JSON.parse(localStorage.getItem('token'))?.token;
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    const response = await axios.get(`${API_URL}/api/BookPost/Search?${queryParams}`, { headers });
     return response.data;
   } catch (error) {
-    console.error("Search Books API error:", error);
+    console.warn('Error searching books:', error.response?.data || error.message);
     throw error;
   }
 };
 
 const checkBookAvailability = async (bookPostId) => {
   try {
-    const token = JSON.parse(localStorage.getItem("token"))?.token;
+    const token = JSON.parse(localStorage.getItem('token'))?.token;
     if (!token) {
-      throw new Error("No token found");
+      throw new Error('No token found');
     }
-
+    if (!bookPostId) {
+      throw new Error('Invalid bookPostId');
+    }
     const response = await axios.get(`${API_URL}/api/BookPost/available/${bookPostId}`, {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
     });
-
     return response.data.available;
   } catch (error) {
-    console.error(`Check Book Availability API error for book ${bookPostId}:`, error);
+    if (error.response?.status === 404) {
+      return false; // Silently handle 404
+    }
+    console.warn(`Check Book Availability API warning for book ${bookPostId}:`, error.response?.data || error.message);
+    throw error;
+  }
+};
+
+// New function to fetch book details, aligning with BookDetailsPage
+const getBookDetails = async (bookPostId) => {
+  try {
+    const token = JSON.parse(localStorage.getItem('token'))?.token;
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    const response = await axios.get(`${API_URL}/api/BookPost/${bookPostId}`, { headers });
+    return response.data;
+  } catch (error) {
+    console.warn(`Error fetching book details for ${bookPostId}:`, error.response?.data || error.message);
     throw error;
   }
 };
@@ -465,6 +469,7 @@ const authService = {
   handleAction,
   searchBooks,
   checkBookAvailability,
+  getBookDetails,
   fetchBorrowRequests,
   returnBook,
   fetchBookPostsByOwner,
