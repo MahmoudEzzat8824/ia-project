@@ -31,6 +31,8 @@ const BookDetailsPage = () => {
 
   const [replyContent, setReplyContent] = useState({});
   const [replySubmitting, setReplySubmitting] = useState(false);
+  const readerDetails = authService.getReaderDetails();
+  const isReader = readerDetails.readerId !== null;
 
   useEffect(() => {
     console.log("BookDetailsPage - id:", id, "state.book:", location.state?.book);
@@ -313,95 +315,118 @@ const BookDetailsPage = () => {
     ? `data:image/jpeg;base64,${book.coverPhoto}`
     : "https://via.placeholder.com/150";
 
-  return (
-    <div className="book-details-page">
-      <div className="book-header">
-        <img src={coverSrc} alt={book.title} className="book-cover-large" />
-        <div className="book-main-info">
-          <h1 className="book-title">{book.title}</h1>
-          <p className="book-author"><strong>Author:</strong> {book.bookOwnerName}</p>
-          <p className="book-genre"><strong>Genre:</strong> {book.genre}</p>
-          <p className="book-price"><strong>Price:</strong> ${book.price}</p>
-          <p className="book-publication-date"><strong>Publication Date:</strong> {book.publicationDate}</p>
-          <p className="book-end-date"><strong>End Date:</strong> {book.endDate}</p>
-          <p className="book-isbn"><strong>ISBN:</strong> {book.isbn}</p>
-          <p className="book-language"><strong>Language:</strong> {book.language}</p>
+    return (
+      <div className="book-details-page">
+        <div className="book-header">
+          <img src={coverSrc} alt={book.title} className="book-cover-large" />
+          <div className="book-main-info">
+            <h1 className="book-title">{book.title}</h1>
+            <p className="book-author"><strong>Author:</strong> {book.bookOwnerName}</p>
+            <p className="book-genre"><strong>Genre:</strong> {book.genre}</p>
+            <p className="book-price"><strong>Price:</strong> ${book.price}</p>
+            <p className="book-publication-date"><strong>Publication Date:</strong> {book.publicationDate}</p>
+            <p className="book-end-date"><strong>End Date:</strong> {book.endDate}</p>
+            <p className="book-isbn"><strong>ISBN:</strong> {book.isbn}</p>
+            <p className="book-language"><strong>Language:</strong> {book.language}</p>
+          </div>
         </div>
-      </div>
-
-      <div className="book-description">
-        <h3>Description</h3>
-        <p>{book.description}</p>
-      </div>
-
-      <div className="reactions">
-        <button
-          className={`like-button ${userReaction === "like" ? "active" : ""}`}
-          onClick={handleLike}
-        >
-          👍 {likes}
-        </button>
-
-        <button
-          className={`dislike-button ${userReaction === "dislike" ? "active" : ""}`}
-          onClick={handleDislike}
-        >
-          👎 {dislikes}
-        </button>
-      </div>
-
-      <div className="comments-section">
-        <h3>Comments</h3>
-        {comments.length === 0 ? (
-          <p>No comments yet.</p>
-        ) : (
-          comments.map((comment) => (
-            <div key={comment.commentID} className="comment">
-              <strong>{comment.readerName}:</strong> {comment.content}
-
-              {/* 🆕 Replies list */}
-              {comment.replies?.map((reply, idx) => (
-                <div key={idx} className="reply ml-6 text-gray-600">
-                  ↳ <strong>{reply.readerName}:</strong> {reply.content}
-                </div>
-              ))}
-
-              {/* 🆕 Reply input */}
+  
+        <div className="book-description">
+          <h3>Description</h3>
+          <p>{book.description}</p>
+        </div>
+  
+        <div className="reactions">
+          {isReader && (
+            <>
+              <button
+                className={`like-button ${userReaction === "like" ? "active" : ""}`}
+                onClick={handleLike}
+              >
+                👍 {likes}
+              </button>
+              <button
+                className={`dislike-button ${userReaction === "dislike" ? "active" : ""}`}
+                onClick={handleDislike}
+              >
+                👎 {dislikes}
+              </button>
+            </>
+          )}
+          {!isReader && (
+            <div className="text-gray-600">
+              Likes: {likes} 👍 | Dislikes: {dislikes} 👎
+            </div>
+          )}
+        </div>
+  
+        <div className="comments-section">
+          <h3>Comments</h3>
+          {comments.length === 0 ? (
+            <p>No comments yet.</p>
+          ) : (
+            comments.map((comment) => (
+              <div key={comment.commentID} className="comment">
+                <strong>{comment.readerName}:</strong> {comment.content}
+                {comment.replies?.map((reply, idx) => (
+                  <div key={idx} className="reply ml-6 text-gray-600">
+                    ↳ <strong>{reply.readerName}:</strong> {reply.content}
+                  </div>
+                ))}
+                {isReader && (
+                  <>
+                    <textarea
+                      className="reply-box"
+                      placeholder="Write a reply..."
+                      value={replyContent[comment.commentID] || ""}
+                      onChange={(e) =>
+                        setReplyContent((prev) => ({ ...prev, [comment.commentID]: e.target.value }))
+                      }
+                      rows={2}
+                    />
+                    <button
+                      onClick={() => handleReplySubmit(comment.commentID)}
+                      className="submit-reply-button"
+                      disabled={replySubmitting}
+                    >
+                      Submit Reply
+                    </button>
+                  </>
+                )}
+              </div>
+            ))
+          )}
+          {isReader && (
+            <>
               <textarea
-                className="reply-box"
-                placeholder="Write a reply..."
-                value={replyContent[comment.commentID] || ""}
-                onChange={(e) =>
-                  setReplyContent((prev) => ({ ...prev, [comment.commentID]: e.target.value }))
-                }
-                rows={2}
+                className="comment-box"
+                placeholder="Write your comment..."
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                rows={3}
               />
               <button
-                onClick={() => handleReplySubmit(comment.commentID)}
-                className="submit-reply-button"
-                disabled={replySubmitting}
+                onClick={handleCommentSubmit}
+                className="submit-comment-button"
+                disabled={submitting}
               >
-                Submit Reply
+                Submit Comment
               </button>
+            </>
+          )}
+          {isReader && (
+            <button className="borrow-book-button" onClick={handleBorrowBook}>
+              Borrow Book
+            </button>
+          )}
+          {!isReader && (
+            <div className="text-gray-600 mt-2">
+              
             </div>
-          ))
-        )}
-        <textarea
-          className="comment-box"
-          placeholder="Write your comment..."
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-          rows={3}
-        />
-        <button onClick={handleCommentSubmit} className="submit-comment-button" disabled={submitting}>
-          Submit Comment
-        </button>
-        <button className="borrow-book-button" onClick={handleBorrowBook}>
-          Borrow Book
-        </button>
+          )}
+        </div>
       </div>
-    </div>
-  );
+    );
 };
 
 export default BookDetailsPage;
