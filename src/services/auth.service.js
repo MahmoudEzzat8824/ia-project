@@ -13,7 +13,7 @@ let readerEmailToShow = null;
 const AdminLogin = async (adminName, passwordHash) => {
   try {
     const response = await axios.post(
-      `${API_URL}/api/admin/login`,
+      `${API_URL}/api/admin/admin/login`,
       { adminName, passwordHash },
       {
         withCredentials: true // ⬅️ This is required for sending/receiving cookies
@@ -131,7 +131,7 @@ const BookOwnerLogin = async (bookOwnerName, password) => {
 const ReaderLogin = async (readerName, password) => {
   try {
     const response = await axios.post(
-      `${API_URL}/api/reader/login`,
+      `${API_URL}/api/reader/reader/login`,
       {
         readerName,
         password,
