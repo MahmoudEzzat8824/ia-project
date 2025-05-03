@@ -61,11 +61,6 @@ function ProfilePage() {
     <>
       <TopBar />
       <UserName />
-      <Link to="/EditProfilePage"> 
-          <button className="edit_profile_button">
-              edit profile
-          </button>
-      </Link>
       <div className="borrow-requests">
           <h2>Your Borrow Requests</h2>
           {loading && <p className="loading">Loading requests...</p>}

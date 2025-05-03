@@ -1,15 +1,13 @@
 import axios from "axios";
 
-
 const API_URL = "https://localhost:7200";
 
 const AdminLogin = async (adminName, passwordHash) => {
   try {
-    const response = await axios
-      .post(`${API_URL}/api/admin/login`, {
-        adminName,
-        passwordHash,
-      });
+    const response = await axios.post(`${API_URL}/api/admin/login`, {
+      adminName,
+      passwordHash,
+    });
     if (response.data.token) {
       localStorage.setItem(
         "token",
@@ -26,13 +24,40 @@ const AdminLogin = async (adminName, passwordHash) => {
   }
 };
 
+const createAdmin = async (adminName, passwordHash) => {
+  try {
+    const token = JSON.parse(localStorage.getItem("token"))?.token;
+    if (!token) {
+      throw new Error("No token found");
+    }
+
+    const response = await axios.post(
+      `${API_URL}/api/admin/create`,
+      {
+        adminName,
+        passwordHash,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Create Admin API error:", error);
+    throw error;
+  }
+};
+
 const BookOwnerLogin = async (bookOwnerName, password) => {
   try {
-    const response = await axios
-      .post(`${API_URL}/api/bookowner/login`, {
-        bookOwnerName,
-        password,
-      });
+    const response = await axios.post(`${API_URL}/api/bookowner/login`, {
+      bookOwnerName,
+      password,
+    });
     if (response.data.token) {
       localStorage.setItem(
         "token",
@@ -168,14 +193,13 @@ const checkBookAvailability = async (bookPostId) => {
     return response.data.available;
   } catch (error) {
     if (error.response?.status === 404) {
-      return false; // Silently handle 404
+      return false;
     }
     console.warn(`Check Book Availability API warning for book ${bookPostId}:`, error.response?.data || error.message);
     throw error;
   }
 };
 
-// New function to fetch book details, aligning with BookDetailsPage
 const getBookDetails = async (bookPostId) => {
   try {
     const token = JSON.parse(localStorage.getItem('token'))?.token;
@@ -349,6 +373,36 @@ const rejectRequest = async (requestId, bookPostId, readerId) => {
   }
 };
 
+const updateBookPost = async (bookPostId, formData) => {
+  try {
+    const token = JSON.parse(localStorage.getItem("token"))?.token;
+    if (!token) {
+      throw new Error("No token found");
+    }
+
+    console.log('Updating book post at:', `${API_URL}/api/bookowner/UpdateBookPost/${bookPostId}`);
+    console.log('FormData fields:', [...formData.entries()]);
+
+    const response = await axios.put(
+      `${API_URL}/api/bookowner/UpdateBookPost/${bookPostId}`,
+      formData,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Update Book Post API error:", error);
+    if (error.response) {
+      throw new Error(`Request failed with status code ${error.response.status}: ${JSON.stringify(error.response.data)}`);
+    }
+    throw error;
+  }
+};
+
 const addLike = async (readerID, bookPostID, isLike) => {
   try {
     const token = JSON.parse(localStorage.getItem("token"))?.token;
@@ -460,8 +514,10 @@ const checkLike = async (readerID, bookPostID) => {
   }
 };
 
+
 const authService = {
   AdminLogin,
+  createAdmin,
   BookOwnerLogin,
   ReaderLogin,
   Logout,
@@ -476,6 +532,7 @@ const authService = {
   fetchBookPosts,
   acceptRequest,
   rejectRequest,
+  updateBookPost,
   addLike,
   updateLike,
   removeLike,

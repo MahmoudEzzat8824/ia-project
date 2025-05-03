@@ -83,6 +83,10 @@ function BookOwnerPage() {
     }
   };
 
+  const handleUpdatePost = (post) => {
+    navigate('/BookPost', { state: { bookPost: post } });
+  };
+
   if (loading) return <div className="loading">Loading...</div>;
   if (error) return <div className="error">{error}</div>;
 
@@ -91,9 +95,6 @@ function BookOwnerPage() {
       <TopBar />
       <UserName />
       <div className="button-container">
-        <Link to="/EditProfilePage">
-          <button className="edit_profile_button">edit profile</button>
-        </Link>
         <Link to="/BookPost">
           <button className="book_post_button">post book</button>
         </Link>
@@ -113,6 +114,12 @@ function BookOwnerPage() {
                       <p className="book-title">Book: {post.title || "Untitled"}</p>
                       <p className="book-isbn">ISBN: {post.isbn || "N/A"}</p>
                       <p className="book-price">Price: ${post.price || "N/A"}</p>
+                      <button
+                        className="update-button"
+                        onClick={() => handleUpdatePost(post)}
+                      >
+                        Update
+                      </button>
                       {associatedRequests.length > 0 ? (
                         associatedRequests.map((request) => {
                           const isPending = request?.requsetStatus?.toLowerCase() === "pending";
