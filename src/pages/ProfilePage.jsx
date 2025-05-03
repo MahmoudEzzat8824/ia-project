@@ -5,7 +5,18 @@ import { Link } from 'react-router-dom';
 import authService from '../services/auth.service';
 import '../index.css';
 
+
+
 function ProfilePage() {
+
+    // useEffect(() => {
+    //     const interval = setInterval(() => {
+    //       authService.refreshTokenIfNeeded();
+    //     }, 60000); // Check every 60 seconds
+    
+    //     return () => clearInterval(interval);
+    //   }, []);
+      
   const [borrowRequests, setBorrowRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

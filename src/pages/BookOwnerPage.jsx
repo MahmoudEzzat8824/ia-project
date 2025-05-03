@@ -5,7 +5,17 @@ import { Link, useNavigate } from 'react-router-dom';
 import authService from '../services/auth.service';
 import '../index.css';
 
+
+
 function BookOwnerPage() {
+  useEffect(() => {
+    const interval = setInterval(() => {
+      authService.refreshTokenIfNeeded();
+    }, 60000); // Check every 60 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+  
   const [bookPosts, setBookPosts] = useState([]);
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);

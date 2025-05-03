@@ -2,8 +2,22 @@ import React, { useState } from 'react';
 import TopBar from "../components/top_bar";
 import UserName from '../components/UserName';
 import EditButton from '../components/EditButton';
+import authService from '../services/auth.service';
+import { useEffect } from 'react';
+
+
+
 
 function EditProfilePage() {
+
+    // useEffect(() => {
+    //     const interval = setInterval(() => {
+    //       authService.refreshTokenIfNeeded();
+    //     }, 60000); // Check every 60 seconds
+    
+    //     return () => clearInterval(interval);
+    //   }, []);
+
     const [userName, setUserName] = useState('username');
     const [password, setPassword] = useState('Password');
     const [email, setEmail] = useState('Email');

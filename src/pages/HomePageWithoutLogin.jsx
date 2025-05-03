@@ -4,7 +4,17 @@ import TopBar from "../components/top_bar";
 import UserNotLoggedCard from "../components/UserNotLoggedCard"; 
 import Posts from "../components/Posts";
 
+
+
 function HomePageWithoutLogin({ currentUser, books, onLoginClick }) {
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     authService.refreshTokenIfNeeded();
+  //   }, 60000); // Check every 60 seconds
+
+  //   return () => clearInterval(interval);
+  // }, []);
+  
   const navigate = useNavigate();
   
   if (localStorage.getItem("token")) {

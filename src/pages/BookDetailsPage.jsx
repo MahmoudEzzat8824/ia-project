@@ -1,9 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import axios from "axios";
+import authService from '../services/auth.service';
 import HomePageWithoutLogin from "./HomePageWithoutLogin";
 
+
+
 const BookDetailsPage = () => {
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      authService.refreshTokenIfNeeded();
+    }, 60000); // Check every 60 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+  
   const location = useLocation();
   const { id } = useParams();
   const [book, setBook] = useState(location.state?.book || null);
