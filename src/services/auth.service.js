@@ -1,9 +1,14 @@
 import axios from "axios";
+import { useState } from "react";
 import { data } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 
+
 const API_URL = "https://localhost:7200";
 
+let readerIdToShow = null;
+let readerNameToShow = null;
+let readerEmailToShow = null;
 
 const AdminLogin = async (adminName, passwordHash) => {
   try {
@@ -15,10 +20,6 @@ const AdminLogin = async (adminName, passwordHash) => {
       }
     );
 
-    const response = await axios.post(`${API_URL}/api/admin/login`, {
-      adminName,
-      passwordHash,
-    });
     if (response.data.token) {
       localStorage.setItem(
         "token",
@@ -36,16 +37,33 @@ const AdminLogin = async (adminName, passwordHash) => {
   }
 };
 
-
 const createAdmin = async (adminName, passwordHash) => {
   try {
-    const token = JSON.parse(localStorage.getItem("token"))?.token;
-    if (!token) {
-      throw new Error("No token found");
+    // Validate inputs
+    if (!adminName || !passwordHash) {
+      throw new Error('adminName and passwordHash are required');
     }
 
+    // Retrieve token from localStorage
+    const tokenData = localStorage.getItem('token');
+    if (!tokenData) {
+      throw new Error('No token found');
+    }
+
+    let token;
+    try {
+      token = JSON.parse(tokenData)?.token;
+    } catch (e) {
+      throw new Error('Invalid token format');
+    }
+
+    if (!token) {
+      throw new Error('Token is missing');
+    }
+
+    // Make API request
     const response = await axios.post(
-      `${API_URL}/api/admin/create`,
+      `${API_URL}/api/admin/create`, // Use template literal with backticks
       {
         adminName,
         passwordHash,
@@ -53,17 +71,30 @@ const createAdmin = async (adminName, passwordHash) => {
       {
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`, // Use template literal with backticks
         },
       }
     );
 
     return response.data;
   } catch (error) {
-    console.error("Create Admin API error:", error);
-    throw error;
+    // Enhanced error handling
+    if (error.response) {
+      // Server responded with a status other than 2xx
+      console.error('Create Admin API error:', error.response.data);
+      throw new Error(error.response.data.message || 'Failed to create admin');
+    } else if (error.request) {
+      // No response received
+      console.error('Create Admin API error: No response received', error.request);
+      throw new Error('No response from server');
+    } else {
+      // Other errors
+      console.error('Create Admin API error:', error.message);
+      throw new Error(error.message);
+    }
   }
 };
+
 
 const BookOwnerLogin = async (bookOwnerName, password) => {
   try {
@@ -405,36 +436,6 @@ const rejectRequest = async (requestId, bookPostId, readerId) => {
   }
 };
 
-const updateBookPost = async (bookPostId, formData) => {
-  try {
-    const token = JSON.parse(localStorage.getItem("token"))?.token;
-    if (!token) {
-      throw new Error("No token found");
-    }
-
-    console.log('Updating book post at:', `${API_URL}/api/bookowner/UpdateBookPost/${bookPostId}`);
-    console.log('FormData fields:', [...formData.entries()]);
-
-    const response = await axios.put(
-      `${API_URL}/api/bookowner/UpdateBookPost/${bookPostId}`,
-      formData,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      }
-    );
-
-    return response.data;
-  } catch (error) {
-    console.error("Update Book Post API error:", error);
-    if (error.response) {
-      throw new Error(`Request failed with status code ${error.response.status}: ${JSON.stringify(error.response.data)}`);
-    }
-    throw error;
-  }
-};
-
 // Helper: Parse JWT and get expiry
 function parseJwt(token) {
   try {
@@ -511,6 +512,117 @@ const refreshTokenIfNeeded = async () => {
   }
 };
 
+const addLike = async (readerID, bookPostID, isLike) => {
+  try {
+    const token = JSON.parse(localStorage.getItem("token"))?.token;
+    if (!token) {
+      throw new Error("No token found");
+    }
+
+    const response = await axios.post(
+      `${API_URL}/api/reader/like`,
+      {
+        readerID,
+        bookPostID,
+        isLike
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Add Like API error:", error);
+    throw error;
+  }
+};
+
+const updateLike = async (readerID, bookPostID, isLike) => {
+  try {
+    const token = JSON.parse(localStorage.getItem("token"))?.token;
+    if (!token) {
+      throw new Error("No token found");
+    }
+
+    const response = await axios.put(
+      `${API_URL}/api/reader/like`,
+      {
+        readerID,
+        bookPostID,
+        isLike
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Update Like API error:", error);
+    throw error;
+  }
+};
+
+const removeLike = async (readerID, bookPostID, isLike) => {
+  try {
+    const token = JSON.parse(localStorage.getItem("token"))?.token;
+    if (!token) {
+      throw new Error("No token found");
+    }
+
+    const response = await axios.delete(
+      `${API_URL}/api/reader/like`,
+      {
+        data: {
+          readerID,
+          bookPostID,
+          isLike
+        },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Remove Like API error:", error);
+    throw error;
+  }
+};
+
+const checkLike = async (readerID, bookPostID) => {
+  try {
+    const token = JSON.parse(localStorage.getItem("token"))?.token;
+    if (!token) {
+      throw new Error("No token found");
+    }
+
+    const response = await axios.get(
+      `${API_URL}/api/reader/check-like?readerID=${readerID}&bookPostID=${bookPostID}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Check Like API error:", error);
+    throw error;
+  }
+};
+
 
 
 
@@ -532,12 +644,11 @@ const authService = {
   fetchBookPosts,
   acceptRequest,
   rejectRequest,
-  updateBookPost,
+  refreshTokenIfNeeded,
   addLike,
   updateLike,
   removeLike,
   checkLike,
-  refreshTokenIfNeeded,
   getReaderDetails: () => {
     const tokenData = JSON.parse(localStorage.getItem("token"));
     if (tokenData && tokenData.role === "reader") {
