@@ -48,9 +48,11 @@ function TopBar() {
               Profile
             </Link>
           )}
+          {hasToken && (
           <Link className="TopBarProfilePageLink" to="/search">
             Search
           </Link>
+          )}
           {hasToken && (
             <Link
               className="logoutButton"

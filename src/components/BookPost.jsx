@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import authService from '../services/auth.service';
 
 function BookPost({ bookOwnerName }) {
@@ -16,6 +16,9 @@ function BookPost({ bookOwnerName }) {
   const [error, setError] = useState('');
   const [coverPhotoPreview, setCoverPhotoPreview] = useState('');
   const navigate = useNavigate();
+  const { state } = useLocation();
+  const bookPost = state?.bookPost || null;
+  const isEditing = !!bookPost;
 
   useEffect(() => {
     const stored = localStorage.getItem('token');
@@ -24,7 +27,19 @@ function BookPost({ bookOwnerName }) {
         const { token, role } = JSON.parse(stored);
         if (token) {
           if (role === 'book_owner') {
-            navigate('/BookPost', { replace: true });
+            if (isEditing) {
+              setTitle(bookPost.title || '');
+              setGenre(bookPost.genre || '');
+              setIsbn(bookPost.isbn || '');
+              setDescription(bookPost.description || '');
+              setLanguage(bookPost.language || '');
+              setPublicationDate(bookPost.publicationDate || '');
+              setStartDate(bookPost.startDate || '');
+              setEndDate(bookPost.endDate || '');
+              setPrice(bookPost.price || '');
+              setCoverPhotoPreview(bookPost.coverPhoto || '');
+              console.log('Editing book post with ID:', bookPost.bookPostID);
+            }
           } else {
             navigate('/login', { replace: true });
           }
@@ -34,22 +49,29 @@ function BookPost({ bookOwnerName }) {
         localStorage.removeItem('token');
       }
     }
-  }, [navigate]);
+  }, [navigate, isEditing, bookPost]);
 
-  const validateForm = () => {
-    if (!title || !genre || !isbn || !description || !language || !publicationDate || !startDate || !endDate || !price || !coverPhoto) {
-      setError('All fields are required');
-      return false;
+  const validateForm = (isEditing) => {
+    if (!isEditing) {
+      if (!title || !genre || !isbn || !description || !language || !publicationDate || !startDate || !endDate || !price || !coverPhoto) {
+        setError('All fields are required for creating a new book post');
+        return false;
+      }
     }
-    if (isNaN(price) || price < 0) {
+
+    if (price && (isNaN(price) || price < 0)) {
       setError('Price must be a non-negative number');
       return false;
     }
-    const isbnRegex = /^[0-9-]{10,17}$/;
-    if (!isbnRegex.test(isbn)) {
-      setError('ISBN must be 10-17 digits or hyphens');
-      return false;
+
+    if (isbn) {
+      const isbnRegex = /^[0-9-]{10,17}$/;
+      if (!isbnRegex.test(isbn)) {
+        setError('ISBN must be 10-17 digits or hyphens');
+        return false;
+      }
     }
+
     return true;
   };
 
@@ -60,89 +82,107 @@ function BookPost({ bookOwnerName }) {
       setCoverPhotoPreview(URL.createObjectURL(file));
     } else {
       setCoverPhoto(null);
-      setCoverPhotoPreview('');
+      setCoverPhotoPreview(isEditing ? bookPost.coverPhoto : '');
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-  
-    if (!validateForm()) {
+
+    if (!validateForm(isEditing)) {
       return;
     }
-  
+
     try {
       const stored = localStorage.getItem('token');
       if (!stored) {
         throw new Error('No authentication token found');
       }
       const parsed = JSON.parse(stored);
-      const token = parsed.token;
-      const bookOwnerID = parsed.bookOwnerID; // Fix: Use bookOwnerID (capital 'ID')
-      console.log('Submitting book post with:', { token, bookOwnerID });
-  
-      if (!token) {
-        throw new Error('Authentication token is missing');
-      }
-  
+      const bookOwnerID = parsed.bookOwnerID;
+
       if (!bookOwnerID) {
         throw new Error('Book Owner ID is missing');
       }
-  
+
       const formData = new FormData();
-      formData.append('bookOwnerID', bookOwnerID); // Use bookOwnerID
-      formData.append('title', title);
-      formData.append('genre', genre);
-      formData.append('isbn', isbn);
-      formData.append('description', description);
-      formData.append('language', language);
-      formData.append('publicationDate', publicationDate);
-      formData.append('startDate', startDate);
-      formData.append('endDate', endDate);
-      formData.append('price', price);
-      if (coverPhoto) {
+      formData.append('bookOwnerID', bookOwnerID);
+
+      if (!isEditing) {
+        formData.append('title', title);
+        formData.append('genre', genre);
+        formData.append('isbn', isbn);
+        formData.append('description', description);
+        formData.append('language', language);
+        formData.append('publicationDate', publicationDate);
+        formData.append('startDate', startDate);
+        formData.append('endDate', endDate);
+        formData.append('price', price);
         formData.append('coverPhoto', coverPhoto);
-      }
-  
-      const response = await fetch('https://localhost:7200/api/bookowner', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        body: formData,
-      });
-  
-      if (!response.ok) {
+
+        console.log('Creating new book post...');
+        console.log('FormData fields:', [...formData.entries()]);
+        const response = await fetch('https://localhost:7200/api/bookowner/post', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${parsed.token}`
+          },
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const contentType = response.headers.get('content-type');
+          let errorMessage = `Request failed with status ${response.status}`;
+          if (contentType && contentType.includes('application/json')) {
+            const errorData = await response.json();
+            errorMessage = errorData.message || JSON.stringify(errorData.errors) || errorMessage;
+          } else {
+            const text = await response.text();
+            errorMessage = text || errorMessage;
+          }
+          throw new Error(errorMessage);
+        }
+
         const contentType = response.headers.get('content-type');
-        let errorMessage = `Request failed with status ${response.status}`;
+        let result = 'Book post created successfully';
         if (contentType && contentType.includes('application/json')) {
-          const errorData = await response.json();
-          errorMessage = errorData.message || JSON.stringify(errorData.errors) || errorMessage;
+          const data = await response.json();
+          result = data.message || result;
         } else {
           const text = await response.text();
-          errorMessage = text || errorMessage;
+          result = text || result;
         }
-        throw new Error(errorMessage);
-      }
-  
-      const contentType = response.headers.get('content-type');
-      let result = 'Book post created successfully';
-      if (contentType && contentType.includes('application/json')) {
-        const data = await response.json();
-        result = data.message || result;
+
+        handleAbort();
+        setError('');
+        alert(result);
+        navigate('/BookOwnerPage', { replace: true });
       } else {
-        const text = await response.text();
-        result = text || result;
+        if (title && title !== bookPost.title) formData.append('title', title);
+        if (genre && genre !== bookPost.genre) formData.append('genre', genre);
+        if (isbn && isbn !== bookPost.isbn) formData.append('isbn', isbn);
+        if (description && description !== bookPost.description) formData.append('description', description);
+        if (language && language !== bookPost.language) formData.append('language', language);
+        if (publicationDate && publicationDate !== bookPost.publicationDate) formData.append('publicationDate', publicationDate);
+        if (startDate && startDate !== bookPost.startDate) formData.append('startDate', startDate);
+        if (endDate && endDate !== bookPost.endDate) formData.append('endDate', endDate);
+        if (price && price !== bookPost.price) formData.append('price', price);
+        if (coverPhoto) formData.append('coverPhoto', coverPhoto);
+
+        console.log('Updating book post with ID:', bookPost.bookPostID);
+        console.log('FormData fields:', [...formData.entries()]);
+        const result = await authService.updateBookPost(bookPost.bookPostID, formData);
+        const message = result.message || 'Book post updated successfully';
+
+        handleAbort();
+        setError('');
+        alert(message);
+        navigate('/BookOwnerPage', { replace: true });
       }
-  
-      handleAbort();
-      setError('');
-      alert(result);
-      navigate('/BookOwnerPage', { replace: true });
     } catch (err) {
       console.error('Error submitting book post:', err);
-      setError(err.message || 'Failed to submit book post');
+      setError(`Failed to submit book post: ${err.message}`);
       if (err.message.includes('401') || err.message.includes('403')) {
         authService.Logout();
         navigate('/login', { replace: true });
@@ -167,18 +207,18 @@ function BookPost({ bookOwnerName }) {
 
   return (
     <div className="form-container">
-      <h2 className="form-title">Create Book Post</h2>
+      <h2 className="form-title">{isEditing ? 'Update Book Post' : 'Create Book Post'}</h2>
       {error && <p className="error-text">{error}</p>}
       <div>
         <div className="input-group">
           <label className="input-label">Title</label>
           <input
-            type="tesxt"
+            type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="input-field"
             placeholder="e.g., The Great Gatsby"
-            required
+            required={!isEditing}
           />
         </div>
         <div className="input-group">
@@ -189,7 +229,7 @@ function BookPost({ bookOwnerName }) {
             onChange={(e) => setGenre(e.target.value)}
             className="input-field"
             placeholder="e.g., Fiction"
-            required
+            required={!isEditing}
           />
         </div>
         <div className="input-group">
@@ -200,7 +240,7 @@ function BookPost({ bookOwnerName }) {
             onChange={(e) => setIsbn(e.target.value)}
             className="input-field"
             placeholder="e.g., 978-0743273565"
-            required
+            required={!isEditing}
           />
         </div>
         <div className="input-group">
@@ -211,7 +251,7 @@ function BookPost({ bookOwnerName }) {
             className="input-field"
             placeholder="e.g., A story of..."
             rows="4"
-            required
+            required={!isEditing}
           ></textarea>
         </div>
         <div className="input-group">
@@ -222,7 +262,7 @@ function BookPost({ bookOwnerName }) {
             onChange={(e) => setLanguage(e.target.value)}
             className="input-field"
             placeholder="e.g., English"
-            required
+            required={!isEditing}
           />
         </div>
         <div className="input-group">
@@ -232,7 +272,7 @@ function BookPost({ bookOwnerName }) {
             value={publicationDate}
             onChange={(e) => setPublicationDate(e.target.value)}
             className="input-field"
-            required
+            required={!isEditing}
           />
         </div>
         <div className="input-group">
@@ -242,7 +282,7 @@ function BookPost({ bookOwnerName }) {
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
             className="input-field"
-            required
+            required={!isEditing}
           />
         </div>
         <div className="input-group">
@@ -252,7 +292,7 @@ function BookPost({ bookOwnerName }) {
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
             className="input-field"
-            required
+            required={!isEditing}
           />
         </div>
         <div className="input-group">
@@ -264,7 +304,7 @@ function BookPost({ bookOwnerName }) {
             className="input-field"
             placeholder="e.g., 15"
             min="0"
-            required
+            required={!isEditing}
           />
         </div>
         <div className="input-group">
@@ -274,7 +314,7 @@ function BookPost({ bookOwnerName }) {
             accept="image/*"
             onChange={handleCoverPhotoChange}
             className="input-field file-input"
-            required
+            required={!isEditing}
           />
           {coverPhotoPreview && (
             <div className="cover-preview">
@@ -287,7 +327,7 @@ function BookPost({ bookOwnerName }) {
             onClick={handleSubmit}
             className="submit-button book-submit-button"
           >
-            Submit
+            {isEditing ? 'Update' : 'Submit'}
           </button>
           <button
             onClick={handleAbort}

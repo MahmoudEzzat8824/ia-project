@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios'; // Import axios
 import authService from '../services/auth.service';
 import '../index.css';
 
@@ -9,34 +8,48 @@ function SearchResults() {
   const navigate = useNavigate();
   const [searchResults, setSearchResults] = useState(location.state?.searchResults || []);
   const [availability, setAvailability] = useState({});
-  const [loading, setLoading] = useState(true); // Start with loading true
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0); // Trigger to refresh data
 
   // Fetch book posts from API
   useEffect(() => {
     const fetchBooks = async () => {
       setLoading(true);
       try {
-        const query = location.state?.query || ''; // Get search query from state
-        // Adjust endpoint and query params as needed
-        const response = await axios.get(`https://localhost:7200/api/BookPosts/search`, {
-          params: { query }, // Pass query as a parameter
-        });
-        console.log('SearchResults - API response:', response.data);
-        setSearchResults(response.data);
+        const query = location.state?.query || '';
+        const response = await authService.searchBooks({ query });
+        console.log('SearchResults - Raw API response:', response);
+        // Map response to include likes and dislikes
+        const mappedResults = response.map(book => {
+          const bookPostID = book.bookPostID || book.id || book.BookPostId;
+          if (!bookPostID) {
+            console.warn('Missing bookPostID in book:', book);
+          }
+          return {
+            bookPostID: bookPostID,
+            title: book.title || 'N/A',
+            genre: book.genre || 'N/A',
+            language: book.language || 'N/A',
+            price: book.price || 0,
+            bookOwnerName: book.bookOwnerName || 'Unknown',
+            likes: book.likes || 0, // Assume API returns likes
+            dislikes: book.dislikes || 0, // Assume API returns dislikes
+          };
+        }).filter(book => book.bookPostID);
+        setSearchResults(mappedResults);
         setError(null);
       } catch (err) {
         console.error('Error fetching books:', err);
-        console.error('Error details:', err.response?.data, err.response?.status);
-        setError('Failed to load book posts.');
+        setError('Failed to load book posts. Please try again.');
         setSearchResults(location.state?.searchResults || []);
       } finally {
         setLoading(false);
       }
     };
-  
+
     fetchBooks();
-  }, [location.state?.query]); // Re-fetch if query changes
+  }, [location.state?.query, refreshTrigger]); // Add refreshTrigger to dependencies
 
   // Fetch availability for books
   useEffect(() => {
@@ -60,12 +73,33 @@ function SearchResults() {
     }
   }, [searchResults]);
 
+  // Handle like/dislike actions
+  const handleLike = async (bookPostID) => {
+    try {
+      await authService.likeBook(bookPostID); // Assume API to like a book
+      setRefreshTrigger(prev => prev + 1); // Trigger re-fetch
+    } catch (error) {
+      console.error('Error liking book:', error);
+      setError('Failed to like book.');
+    }
+  };
+
+  const handleDislike = async (bookPostID) => {
+    try {
+      await authService.dislikeBook(bookPostID); // Assume API to dislike a book
+      setRefreshTrigger(prev => prev + 1); // Trigger re-fetch
+    } catch (error) {
+      console.error('Error disliking book:', error);
+      setError('Failed to dislike book.');
+    }
+  };
+
   const handleViewDetails = (bookPost) => {
     if (!bookPost?.bookPostID) {
-      console.error('Invalid book post:', bookPost);
+      console.error('Invalid book post: bookPostID is missing', bookPost);
+      setError('Cannot view details: Invalid book post.');
       return;
     }
-    console.log('Navigating to book:', bookPost.bookPostID, bookPost);
     navigate(`/book/${bookPost.bookPostID}`, { state: { book: bookPost } });
   };
 
@@ -83,11 +117,11 @@ function SearchResults() {
               key={bookPost.bookPostID}
               className="book-post-card bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition"
             >
-              <h2 className="text-xl font-semibold text-blue-600">{bookPost.title || 'N/A'}</h2>
-              <p className="text-gray-600"><strong>Genre:</strong> {bookPost.genre || ' Tablet'}</p>
-              <p className="text-gray-600"><strong>Language:</strong> {bookPost.language || 'N/A'}</p>
-              <p className="text-gray-600"><strong>Price:</strong> ${bookPost.price?.toFixed(2) || 'N/A'}</p>
-              <p className="text-gray-600"><strong>Posted by:</strong> {bookPost.bookOwnerName || 'Unknown'}</p>
+              <h2 className="text-xl font-semibold text-blue-600">{bookPost.title}</h2>
+              <p className="text-gray-600"><strong>Genre:</strong> {bookPost.genre}</p>
+              <p className="text-gray-600"><strong>Language:</strong> {bookPost.language}</p>
+              <p className="text-gray-600"><strong>Price:</strong> ${bookPost.price.toFixed(2)}</p>
+              <p className="text-gray-600"><strong>Posted by:</strong> {bookPost.bookOwnerName}</p>
               <p className="text-gray-600">
                 <strong>Availability:</strong>{' '}
                 {availability[bookPost.bookPostID] === undefined
@@ -96,12 +130,26 @@ function SearchResults() {
                   ? 'Available'
                   : 'Not Available'}
               </p>
+              <p className="text-gray-600">
+                <strong>Likes:</strong> {bookPost.likes} | <strong>Dislikes:</strong> {bookPost.dislikes}
+              </p>
+              <div className="flex space-x-2 mt-2">
+                <button
+                  onClick={() => handleLike(bookPost.bookPostID)}
+                  className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+                >
+                  Like
+                </button>
+                <button
+                  onClick={() => handleDislike(bookPost.bookPostID)}
+                  className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+                >
+                  Dislike
+                </button>
+              </div>
               <button
-                onClick={() => {
-                  console.log('View Details clicked for:', bookPost.bookPostID);
-                  handleViewDetails(bookPost);
-                }}
-                className="details-button bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                onClick={() => handleViewDetails(bookPost)}
+                className="details-button bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mt-2"
               >
                 View Details
               </button>

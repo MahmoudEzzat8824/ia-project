@@ -29,26 +29,30 @@ const BookDetailsPage = () => {
   const [likes, setLikes] = useState(0);
   const [dislikes, setDislikes] = useState(0);
 
-  // 🆕 State for reply
   const [replyContent, setReplyContent] = useState({});
   const [replySubmitting, setReplySubmitting] = useState(false);
 
   useEffect(() => {
-    if (!book && id) {
+    console.log("BookDetailsPage - id:", id, "state.book:", location.state?.book);
+    if (!book && id && id !== "undefined") {
       setLoading(true);
-      axios
-        .get(`https://localhost:7200/api/BookPost/${id}`)
-        .then((res) => {
-          setBook(res.data);
-          setLikes(res.data.totalLikes || 0);
-          setDislikes(res.data.totalDislikes || 0);
+      authService
+        .getBookDetails(id) // Use authService to fetch book details
+        .then((data) => {
+          console.log("BookDetailsPage - Fetched book:", data);
+          setBook(data);
+          setLikes(data.totalLikes || 0);
+          setDislikes(data.totalDislikes || 0);
           setLoading(false);
         })
         .catch((err) => {
-          console.error("Error fetching book:", err);
-          setError("Failed to load book details.");
+          console.error("Error fetching book:", err.response?.data || err.message);
+          setError(`Failed to load book details: ${err.message}`);
           setLoading(false);
         });
+    } else if (!id || id === "undefined") {
+      setError("Invalid book ID. Please select a valid book.");
+      setLoading(false);
     } else if (book) {
       setLikes(book.totalLikes || 0);
       setDislikes(book.totalDislikes || 0);
@@ -57,6 +61,7 @@ const BookDetailsPage = () => {
 
   useEffect(() => {
     if (book?.bookPostID) {
+      // Fetch comments
       axios
         .get(`https://localhost:7200/api/BookPost/comments/${book.bookPostID}`)
         .then((res) => setComments(res.data))
@@ -65,17 +70,42 @@ const BookDetailsPage = () => {
           setError("Failed to load comments.");
         });
 
+      // Fetch user reaction using authService.checkLike
       const rawToken = localStorage.getItem("token");
       if (rawToken) {
-        const parsed = JSON.parse(rawToken);
-        const readerID = parsed.readerID;
-        axios
-          .get(`https://localhost:7200/api/reader/reaction/${readerID}/${book.bookPostID}`)
-          .then((res) => {
-            if (res.data?.isLike === true) setUserReaction("like");
-            else if (res.data?.isLike === false) setUserReaction("dislike");
-          })
-          .catch((err) => console.error("Error fetching user reaction:", err));
+        try {
+          const parsed = JSON.parse(rawToken);
+          const readerID = parsed.readerID;
+          if (readerID && book.bookPostID) {
+            authService
+              .checkLike(readerID, book.bookPostID)
+              .then((data) => {
+                if (data?.isLike === true) setUserReaction("like");
+                else if (data?.isLike === false) setUserReaction("dislike");
+                else setUserReaction(null);
+              })
+              .catch((err) => {
+                if (err.response?.status === 404) {
+                  setUserReaction(null); // No reaction exists
+                } else {
+                  console.error("Error fetching user reaction:", {
+                    message: err.message,
+                    status: err.response?.status,
+                    data: err.response?.data,
+                  });
+                }
+              });
+          } else {
+            console.error("Missing readerID or bookPostID:", {
+              readerID,
+              bookPostID: book.bookPostID,
+            });
+          }
+        } catch (err) {
+          console.error("Error parsing token:", err);
+        }
+      } else {
+        console.error("No token found in localStorage");
       }
     }
   }, [book]);
@@ -162,79 +192,66 @@ const BookDetailsPage = () => {
     console.log("Like button clicked ✅");
     const rawToken = localStorage.getItem("token");
     if (!rawToken || !book) return;
-
+  
     const parsed = JSON.parse(rawToken);
-    const token = parsed.token;
     const readerID = parsed.readerID;
-
+  
     try {
       if (userReaction === "like") {
-        await axios.delete("https://localhost:7200/api/reader/like", {
-          data: { readerID, bookPostID: book.bookPostID, isLike: true },
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        await authService.removeLike(readerID, book.bookPostID, true);
         setUserReaction(null);
         setLikes((prev) => Math.max(prev - 1, 0));
       } else if (userReaction === "dislike") {
-        await axios.put(
-          "https://localhost:7200/api/reader/like",
-          { readerID, bookPostID: book.bookPostID, isLike: true },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        await authService.updateLike(readerID, book.bookPostID, true);
         setUserReaction("like");
         setLikes((prev) => prev + 1);
         setDislikes((prev) => Math.max(prev - 1, 0));
       } else {
-        await axios.post(
-          "https://localhost:7200/api/reader/like",
-          { readerID, bookPostID: book.bookPostID, isLike: true },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        await authService.addLike(readerID, book.bookPostID, true);
         setUserReaction("like");
         setLikes((prev) => prev + 1);
       }
     } catch (error) {
-      console.error("Error handling like:", error);
+      if (error.response?.status === 409) {
+        console.warn("Reaction already exists, ignoring duplicate.");
+        // Optionally notify the user or refresh the reaction state
+        setUserReaction("like");
+      } else {
+        console.error("Error handling like:", error);
+      }
     }
   };
-
+  
   const handleDislike = async () => {
     console.log("Dislike button clicked ✅");
     const rawToken = localStorage.getItem("token");
     if (!rawToken || !book) return;
-
+  
     const parsed = JSON.parse(rawToken);
-    const token = parsed.token;
     const readerID = parsed.readerID;
-
+  
     try {
       if (userReaction === "dislike") {
-        await axios.delete("https://localhost:7200/api/reader/like", {
-          data: { readerID, bookPostID: book.bookPostID, isLike: false },
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        await authService.removeLike(readerID, book.bookPostID, false);
         setUserReaction(null);
         setDislikes((prev) => Math.max(prev - 1, 0));
       } else if (userReaction === "like") {
-        await axios.put(
-          "https://localhost:7200/api/reader/like",
-          { readerID, bookPostID: book.bookPostID, isLike: false },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        await authService.updateLike(readerID, book.bookPostID, false);
         setUserReaction("dislike");
         setDislikes((prev) => prev + 1);
         setLikes((prev) => Math.max(prev - 1, 0));
       } else {
-        await axios.post(
-          "https://localhost:7200/api/reader/like",
-          { readerID, bookPostID: book.bookPostID, isLike: false },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        await authService.addLike(readerID, book.bookPostID, false);
         setUserReaction("dislike");
         setDislikes((prev) => prev + 1);
       }
     } catch (error) {
-      console.error("Error handling dislike:", error);
+      if (error.response?.status === 409) {
+        console.warn("Reaction already exists, ignoring duplicate.");
+        setUserReaction("dislike");
+      } else {
+        console.error("Error handling dislike:", error);
+      }
     }
   };
 
