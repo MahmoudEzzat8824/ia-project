@@ -123,7 +123,7 @@ function BookPost({ bookOwnerName }) {
 
         console.log('Creating new book post...');
         console.log('FormData fields:', [...formData.entries()]);
-        const response = await fetch('https://localhost:7200/api/bookowner/post', {
+        const response = await fetch('https://localhost:7200/api/bookowner', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${parsed.token}`
@@ -185,7 +185,7 @@ function BookPost({ bookOwnerName }) {
       setError(`Failed to submit book post: ${err.message}`);
       if (err.message.includes('401') || err.message.includes('403')) {
         authService.Logout();
-        navigate('/login', { replace: true });
+        navigate('/Login', { replace: true });
       }
     }
   };

@@ -18,6 +18,7 @@ function SignupPage({ setPage }) {
   const [ssnError, setSsnError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [userType, setUserType] = useState('reader');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const validateEmail = (email) => {
@@ -143,90 +144,100 @@ function SignupPage({ setPage }) {
     }
   };
 
-    return (
-        <div className="form-container">
-          <h2 className="form-title">Sign Up for Bookstore</h2>
-          {error && <p className="error-text">{error}</p>}
-          {emailError && <p className="error-text">{emailError}</p>}
-          {phoneError && <p className="error-text">{phoneError}</p>}
-          <div>
-            <UsernameInput
+  return (
+    <div className="form-container signup-page-container">
+      <div className="signup-page-card">
+        <h2 className="form-title signup-header">Sign Up for Bookstore</h2>
+        {error && <p className="error-text error-message">{error}</p>}
+        {emailError && <p className="error-text error-message">{emailError}</p>}
+        {phoneError && <p className="error-text error-message">{phoneError}</p>}
+        <div>
+          <UsernameInput
             userName={userName}
             setuserName={setUserName}
             className="input-group"
-            />
-            <EmailInput
-          email={email}
-          setEmail={setEmail}
-          className="input-group"
-            />
-            {userType === 'bookowner' &&
-            <div className="input-group">
-            <SSNInput
-            ssn ={ssn}
-            setSsn={setSsn}
+          />
+          <EmailInput
+            email={email}
+            setEmail={setEmail}
             className="input-group"
-            />
+          />
+          {userType === 'bookowner' &&
+            <div className="input-group">
+              <SSNInput
+                ssn={ssn}
+                setSsn={setSsn}
+                className="input-group"
+              />
             </div>
-            }
-            <PhoneNumberInput
+          }
+          <PhoneNumberInput
             phoneNumber={phoneNumber}
             setPhoneNumber={setPhoneNumber}
             className="input-group"
-            />
-            <PasswordInput
-          password={password}
-          setPassword={setPassword}
-          showPassword={showPassword}
-          setShowPassword={setShowPassword}
-          className="input-group relative"
-            />
-            
-            <div className="input-group">
-              <label className="block mb-2">Account Type:</label>
-              <div className="flex space-x-4">
-                <label className="flex items-center space-x-2">
-                  <input
-                    type="radio"
-                    name="userType"
-                    value="reader"
-                    checked={userType === 'reader'}
-                    onChange={(e) => setUserType(e.target.value)}
-                    className="form-radio"
-                  />
-                  <span>Reader</span>
-                </label>
-                <label className="flex items-center space-x-2">
-                  <input
-                    type="radio"
-                    name="userType"
-                    value="bookowner"
-                    checked={userType === 'bookowner'}
-                    onChange={(e) => setUserType(e.target.value)}
-                    className="form-radio"
-                  />
-                  <span>Book Owner</span>
-                </label>
-              </div>
+          />
+          <PasswordInput
+            password={password}
+            setPassword={setPassword}
+            showPassword={showPassword}
+            setShowPassword={setShowPassword}
+            className="input-group relative"
+          />
+          
+          <div className="input-group role-selector">
+            <label className="block mb-2">Account Type:</label>
+            <div className="flex space-x-4 role-options">
+              <label className="flex items-center space-x-2 role-option">
+                <input
+                  type="radio"
+                  name="userType"
+                  value="reader"
+                  checked={userType === 'reader'}
+                  onChange={(e) => setUserType(e.target.value)}
+                  className="form-radio"
+                />
+                <span className={userType === 'reader' ? 'active' : ''}>Reader</span>
+              </label>
+              <label className="flex items-center space-x-2 role-option">
+                <input
+                  type="radio"
+                  name="userType"
+                  value="bookowner"
+                  checked={userType === 'bookowner'}
+                  onChange={(e) => setUserType(e.target.value)}
+                  className="form-radio"
+                />
+                <span className={userType === 'bookowner' ? 'active' : ''}>Book Owner</span>
+              </label>
             </div>
-            <button
-              type="button"
-              onClick={handleSignup}
-              className="submit-button signup-button"
-            >
-              Sign Up
-            </button>
           </div>
-          <p className="switch-text">
-            Already have an account?{' '}
-            <Link to="/login">
-              <button className="switch-link signup-link">
-                Login
-              </button>
-            </Link>
-          </p>
+          <button
+            type="button"
+            onClick={handleSignup}
+            className="submit-button signup-button"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <>
+                <span className="spinner"></span>
+                Signing Up...
+              </>
+            ) : (
+              'Sign Up'
+            )}
+          </button>
         </div>
-      );
+        <p className="switch-text login-redirect">
+          Already have an account?{' '}
+          <Link to="/login">
+            <button className="switch-link login-link">
+              Login
+            </button>
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
     }
 
     export default SignupPage;
