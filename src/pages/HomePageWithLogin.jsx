@@ -4,7 +4,7 @@ import TopBar from "../components/top_bar";
 import UserInfoCard from "../components/UserInfoCard";
 import Posts from "../components/Posts";
 import authService from '../services/auth.service';
-
+import '../Styles/HomePageWithLogin.css'
   
 function HomePageWithLogin({ currentUser, books, onLoginClick }) {
 
@@ -28,11 +28,13 @@ function HomePageWithLogin({ currentUser, books, onLoginClick }) {
 
   return (
     <>
-      <TopBar />
-      <div className="main-page">
-        <UserInfoCard />
-        <Posts />
-      </div>
+     <div className="HomePageWithLogin">
+  <TopBar />
+  <div className="main-page">
+    <UserInfoCard />
+    <Posts />
+  </div>
+</div>
     </>
   );
 }

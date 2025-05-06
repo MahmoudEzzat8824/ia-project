@@ -3,7 +3,7 @@ import { useLocation, useParams } from "react-router-dom";
 import axios from "axios";
 import authService from '../services/auth.service';
 import HomePageWithoutLogin from "./HomePageWithoutLogin";
-
+import '../Styles/BookDetailsPage.css'
 
 
 const BookDetailsPage = () => {

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import website_logo from '../assets/website_logo.png';
 import authService from '../services/auth.service';
+import '../Styles/TopBar.css'
 
 function TopBar() {
   const hasToken = !!localStorage.getItem('token');

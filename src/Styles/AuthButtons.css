@@ -1,0 +1,29 @@
+/* Shared Button Styles */
+.auth-button {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  
+  .primary-button {
+    background: var(--primary-blue);
+    color: white;
+    border: none;
+  }
+  
+  .primary-button:hover {
+    background: var(--dark-blue);
+  }
+  
+  .secondary-button {
+    background: transparent;
+    color: var(--primary-blue);
+    border: none;
+  }
+  
+  .secondary-button:hover {
+    text-decoration: underline;
+  }

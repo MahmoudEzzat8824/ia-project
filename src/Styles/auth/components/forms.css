@@ -1,0 +1,11 @@
+/* Form container styles */
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  border-radius: 18px;
+  padding: 20px;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(0, 123, 255, 0.1));
+  box-shadow: 0 8px 24px rgba(0, 71, 171, 0.2);
+  z-index: 2;
+}

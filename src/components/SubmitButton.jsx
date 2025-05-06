@@ -1,3 +1,5 @@
+import '../styles/auth/components/buttons.css'; // Button styles
+
 function SubmitButton({ handleLogin }) {
     return (
       <button

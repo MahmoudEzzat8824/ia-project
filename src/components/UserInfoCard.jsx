@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import authService from "../services/auth.service";
+import '../Styles/UserInfoCard.css'
 
 export default function UserInfoCard() {
   const [readerDetails, setReaderDetails] = useState({

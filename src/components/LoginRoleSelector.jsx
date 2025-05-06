@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import '../styles/auth/components/role-selector.css'; // Role selector styles
 
 const LoginRoleSelector = ({ onSelect }) => {
   const [selectedRole, setSelectedRole] = useState("");

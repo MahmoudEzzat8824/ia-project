@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import authService from '../services/auth.service';
-import '../index.css';
+import '../Styles/SearchResults.css';
 
 function SearchResults() {
   const location = useLocation();
@@ -10,7 +10,7 @@ function SearchResults() {
   const [availability, setAvailability] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [refreshTrigger, setRefreshTrigger] = useState(0); // Trigger to refresh data
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Fetch book posts from API
   useEffect(() => {
@@ -20,7 +20,6 @@ function SearchResults() {
         const query = location.state?.query || '';
         const response = await authService.searchBooks({ query });
         console.log('SearchResults - Raw API response:', response);
-        // Map response to include likes and dislikes
         const mappedResults = response.map(book => {
           const bookPostID = book.bookPostID || book.id || book.BookPostId;
           if (!bookPostID) {
@@ -33,8 +32,9 @@ function SearchResults() {
             language: book.language || 'N/A',
             price: book.price || 0,
             bookOwnerName: book.bookOwnerName || 'Unknown',
-            likes: book.likes || 0, // Assume API returns likes
-            dislikes: book.dislikes || 0, // Assume API returns dislikes
+            likes: book.likes || 0,
+            dislikes: book.dislikes || 0,
+            coverPhoto: book.coverPhoto || null,
           };
         }).filter(book => book.bookPostID);
         setSearchResults(mappedResults);
@@ -49,7 +49,7 @@ function SearchResults() {
     };
 
     fetchBooks();
-  }, [location.state?.query, refreshTrigger]); // Add refreshTrigger to dependencies
+  }, [location.state?.query, refreshTrigger]);
 
   // Fetch availability for books
   useEffect(() => {
@@ -73,11 +73,10 @@ function SearchResults() {
     }
   }, [searchResults]);
 
-  // Handle like/dislike actions
   const handleLike = async (bookPostID) => {
     try {
-      await authService.likeBook(bookPostID); // Assume API to like a book
-      setRefreshTrigger(prev => prev + 1); // Trigger re-fetch
+      await authService.likeBook(bookPostID);
+      setRefreshTrigger(prev => prev + 1);
     } catch (error) {
       console.error('Error liking book:', error);
       setError('Failed to like book.');
@@ -86,8 +85,8 @@ function SearchResults() {
 
   const handleDislike = async (bookPostID) => {
     try {
-      await authService.dislikeBook(bookPostID); // Assume API to dislike a book
-      setRefreshTrigger(prev => prev + 1); // Trigger re-fetch
+      await authService.dislikeBook(bookPostID);
+      setRefreshTrigger(prev => prev + 1);
     } catch (error) {
       console.error('Error disliking book:', error);
       setError('Failed to dislike book.');
@@ -104,55 +103,71 @@ function SearchResults() {
   };
 
   return (
-    <div className="search-results-container p-4 bg-gray-100 min-h-screen">
-      <h1 className="text-3xl font-bold text-blue-600 mb-6">Search Results</h1>
-      {loading && <p className="text-gray-600">Loading books...</p>}
-      {error && <p className="text-red-600">{error}</p>}
+    <div className="search-results-container">
+      <h1 className="search-results-header">Search Results</h1>
+      
+      {loading && <p className="loading-text">Loading books...</p>}
+      {error && <p className="error-text">{error}</p>}
+      
       {searchResults.length === 0 && !loading ? (
-        <p className="text-gray-600">No book posts found.</p>
+        <p className="no-results-text">No book posts found.</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="books-grid">
           {searchResults.map((bookPost) => (
             <div
               key={bookPost.bookPostID}
-              className="book-post-card bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition"
+              className="book-card"
             >
-              <h2 className="text-xl font-semibold text-blue-600">{bookPost.title}</h2>
-              <p className="text-gray-600"><strong>Genre:</strong> {bookPost.genre}</p>
-              <p className="text-gray-600"><strong>Language:</strong> {bookPost.language}</p>
-              <p className="text-gray-600"><strong>Price:</strong> ${bookPost.price.toFixed(2)}</p>
-              <p className="text-gray-600"><strong>Posted by:</strong> {bookPost.bookOwnerName}</p>
-              <p className="text-gray-600">
-                <strong>Availability:</strong>{' '}
-                {availability[bookPost.bookPostID] === undefined
-                  ? 'Checking...'
-                  : availability[bookPost.bookPostID]
-                  ? 'Available'
-                  : 'Not Available'}
-              </p>
-              <p className="text-gray-600">
-                <strong>Likes:</strong> {bookPost.likes} | <strong>Dislikes:</strong> {bookPost.dislikes}
-              </p>
-              <div className="flex space-x-2 mt-2">
+              {bookPost.coverPhoto && (
+                <img 
+                  src={`data:image/jpeg;base64,${bookPost.coverPhoto}`} 
+                  alt={bookPost.title}
+                  className="book-cover"
+                  onError={(e) => {
+                    e.target.src = 'https://placehold.co/300x200?text=No+Cover';
+                  }}
+                />
+              )}
+              <div className="book-content">
+                <h2 className="book-title">{bookPost.title}</h2>
+                <p className="book-info"><span className="info-label">Genre:</span> {bookPost.genre}</p>
+                <p className="book-info"><span className="info-label">Language:</span> {bookPost.language}</p>
+                <p className="book-info"><span className="info-label">Price:</span> ${bookPost.price.toFixed(2)}</p>
+                <p className="book-info"><span className="info-label">Posted by:</span> {bookPost.bookOwnerName}</p>
+                <p className={`availability ${availability[bookPost.bookPostID] ? 'available' : 'not-available'}`}>
+                  <span className="info-label">Availability:</span> {availability[bookPost.bookPostID] === undefined ? 'Checking...' : availability[bookPost.bookPostID] ? 'Available' : 'Not Available'}
+                </p>
+                <div className="rating-container">
+                  <span className="likes">{bookPost.likes} 👍</span>
+                  <span className="dislikes">{bookPost.dislikes} 👎</span>
+                </div>
+                <div className="actions">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleLike(bookPost.bookPostID);
+                    }}
+                    className="like-button"
+                  >
+                    Like
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDislike(bookPost.bookPostID);
+                    }}
+                    className="dislike-button"
+                  >
+                    Dislike
+                  </button>
+                </div>
                 <button
-                  onClick={() => handleLike(bookPost.bookPostID)}
-                  className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+                  onClick={() => handleViewDetails(bookPost)}
+                  className="details-button"
                 >
-                  Like
-                </button>
-                <button
-                  onClick={() => handleDislike(bookPost.bookPostID)}
-                  className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
-                >
-                  Dislike
+                  View Details
                 </button>
               </div>
-              <button
-                onClick={() => handleViewDetails(bookPost)}
-                className="details-button bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mt-2"
-              >
-                View Details
-              </button>
             </div>
           ))}
         </div>

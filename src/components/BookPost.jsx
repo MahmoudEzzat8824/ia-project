@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import authService from '../services/auth.service';
+import TopBar from '../components/top_bar';
+import '../Styles/BookPostFancy.css';
 
 function BookPost({ bookOwnerName }) {
   const [title, setTitle] = useState('');
@@ -206,138 +208,141 @@ function BookPost({ bookOwnerName }) {
   };
 
   return (
-    <div className="form-container">
-      <h2 className="form-title">{isEditing ? 'Update Book Post' : 'Create Book Post'}</h2>
-      {error && <p className="error-text">{error}</p>}
-      <div>
-        <div className="input-group">
-          <label className="input-label">Title</label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="input-field"
-            placeholder="e.g., The Great Gatsby"
-            required={!isEditing}
-          />
-        </div>
-        <div className="input-group">
-          <label className="input-label">Genre</label>
-          <input
-            type="text"
-            value={genre}
-            onChange={(e) => setGenre(e.target.value)}
-            className="input-field"
-            placeholder="e.g., Fiction"
-            required={!isEditing}
-          />
-        </div>
-        <div className="input-group">
-          <label className="input-label">ISBN</label>
-          <input
-            type="text"
-            value={isbn}
-            onChange={(e) => setIsbn(e.target.value)}
-            className="input-field"
-            placeholder="e.g., 978-0743273565"
-            required={!isEditing}
-          />
-        </div>
-        <div className="input-group">
-          <label className="input-label">Description</label>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="input-field"
-            placeholder="e.g., A story of..."
-            rows="4"
-            required={!isEditing}
-          ></textarea>
-        </div>
-        <div className="input-group">
-          <label className="input-label">Language</label>
-          <input
-            type="text"
-            value={language}
-            onChange={(e) => setLanguage(e.target.value)}
-            className="input-field"
-            placeholder="e.g., English"
-            required={!isEditing}
-          />
-        </div>
-        <div className="input-group">
-          <label className="input-label">Publication Date</label>
-          <input
-            type="date"
-            value={publicationDate}
-            onChange={(e) => setPublicationDate(e.target.value)}
-            className="input-field"
-            required={!isEditing}
-          />
-        </div>
-        <div className="input-group">
-          <label className="input-label">Available From</label>
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            className="input-field"
-            required={!isEditing}
-          />
-        </div>
-        <div className="input-group">
-          <label className="input-label">Available Until</label>
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            className="input-field"
-            required={!isEditing}
-          />
-        </div>
-        <div className="input-group">
-          <label className="input-label">Price ($)</label>
-          <input
-            type="number"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            className="input-field"
-            placeholder="e.g., 15"
-            min="0"
-            required={!isEditing}
-          />
-        </div>
-        <div className="input-group">
-          <label className="input-label">Cover Photo</label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleCoverPhotoChange}
-            className="input-field file-input"
-            required={!isEditing}
-          />
-          {coverPhotoPreview && (
-            <div className="cover-preview">
-              <img src={coverPhotoPreview} alt="Cover Preview" className="cover-image" />
-            </div>
-          )}
-        </div>
-        <div className="button-group">
-          <button
-            onClick={handleSubmit}
-            className="submit-button book-submit-button"
-          >
-            {isEditing ? 'Update' : 'Submit'}
-          </button>
-          <button
-            onClick={handleAbort}
-            className="submit-button book-abort-button"
-          >
-            Abort
-          </button>
+    <>
+      <TopBar />
+      <div className="form-container">
+        <h2 className="form-title">{isEditing ? 'Update Book Post' : 'Create Book Post'}</h2>
+        {error && <p className="error-text">{error}</p>}
+        <div>
+          <div className="input-group">
+            <label className="input-label">Title</label>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="input-field"
+              placeholder="e.g., The Great Gatsby"
+              required={!isEditing}
+            />
+          </div>
+          <div className="input-group">
+            <label className="input-label">Genre</label>
+            <input
+              type="text"
+              value={genre}
+              onChange={(e) => setGenre(e.target.value)}
+              className="input-field"
+              placeholder="e.g., Fiction"
+              required={!isEditing}
+            />
+          </div>
+          <div className="input-group">
+            <label className="input-label">ISBN</label>
+            <input
+              type="text"
+              value={isbn}
+              onChange={(e) => setIsbn(e.target.value)}
+              className="input-field"
+              placeholder="e.g., 978-0743273565"
+              required={!isEditing}
+            />
+          </div>
+          <div className="input-group">
+            <label className="input-label">Description</label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="input-field"
+              placeholder="e.g., A story of..."
+              rows="4"
+              required={!isEditing}
+            ></textarea>
+          </div>
+          <div className="input-group">
+            <label className="input-label">Language</label>
+            <input
+              type="text"
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              className="input-field"
+              placeholder="e.g., English"
+              required={!isEditing}
+            />
+          </div>
+          <div className="input-group">
+            <label className="input-label">Publication Date</label>
+            <input
+              type="date"
+              value={publicationDate}
+              onChange={(e) => setPublicationDate(e.target.value)}
+              className="input-field"
+              required={!isEditing}
+            />
+          </div>
+          <div className="input-group">
+            <label className="input-label">Available From</label>
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="input-field"
+              required={!isEditing}
+            />
+          </div>
+          <div className="input-group">
+            <label className="input-label">Available Until</label>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="input-field"
+              required={!isEditing}
+            />
+          </div>
+          <div className="input-group">
+            <label className="input-label">Price ($)</label>
+            <input
+              type="number"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              className="input-field"
+              placeholder="e.g., 15"
+              min="0"
+              required={!isEditing}
+            />
+          </div>
+          <div className="input-group">
+            <label className="input-label">Cover Photo</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleCoverPhotoChange}
+              className="input-field file-input"
+              required={!isEditing}
+            />
+            {coverPhotoPreview && (
+              <div className="cover-preview">
+                <img src={coverPhotoPreview} alt="Cover Preview" className="cover-image" />
+              </div>
+            )}
+          </div>
+          <div className="button-group">
+            <button
+              onClick={handleSubmit}
+              className="submit-button book-submit-button"
+            >
+              {isEditing ? 'Update' : 'Submit'}
+            </button>
+            <button
+              onClick={handleAbort}
+              className="submit-button book-abort-button"
+            >
+              Abort
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

@@ -1,3 +1,5 @@
+import '../styles/auth/components/inputs.css'; // Input field styles
+
 function PhoneNumberInput({ phoneNumber, setPhoneNumber, className }) {
     return (
       <div className={className}>

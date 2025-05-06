@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import BookPostCard from "./BookPostCard";
 import axios from "axios";
+import '../Styles/Posts.css'
 
 const Posts = () => {
   const [posts, setPosts] = useState([]);

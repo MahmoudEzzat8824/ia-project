@@ -3,9 +3,7 @@ import TopBar from "../components/top_bar";
 import UserName from '../components/UserName';
 import { Link, useNavigate } from 'react-router-dom';
 import authService from '../services/auth.service';
-import '../index.css';
-
-
+import '../Styles/BookOwnerPage.css';
 
 function BookOwnerPage() {
   useEffect(() => {
@@ -15,7 +13,7 @@ function BookOwnerPage() {
 
     return () => clearInterval(interval);
   }, []);
-  
+
   const [bookPosts, setBookPosts] = useState([]);
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -101,82 +99,83 @@ function BookOwnerPage() {
   if (error) return <div className="error">{error}</div>;
 
   return (
-    <div className="container">
+    <>
       <TopBar />
-      <UserName />
-      <div className="button-container">
-        <Link to="/BookPost">
-          <button className="book_post_button">post book</button>
-        </Link>
-      </div>
-      <div className="borrow-requests">
-        <h2>Your Book Posts</h2>
-        {bookPosts.length === 0 ? (
-          <p className="no-posts">No book posts found.</p>
-        ) : (
-          <ul className="request-list">
-            {bookPosts.map((post) => {
-              const associatedRequests = requests.filter((req) => req.bookPostID === post.bookPostID);
-              return (
-                <li key={post.bookPostID} className="request-item">
-                  <div className="request-details">
-                    <div className="request-info">
-                      <p className="book-title">Book: {post.title || "Untitled"}</p>
-                      <p className="book-isbn">ISBN: {post.isbn || "N/A"}</p>
-                      <p className="book-price">Price: ${post.price || "N/A"}</p>
-                      <button
-                        className="update-button"
-                        onClick={() => handleUpdatePost(post)}
-                      >
-                        Update
-                      </button>
-                      {associatedRequests.length > 0 ? (
-                        associatedRequests.map((request) => {
-                          const isPending = request?.requsetStatus?.toLowerCase() === "pending";
-                          const statusText = request.requsetStatus === "Returned" ? "Available" : request.requsetStatus || "N/A";
-                          const statusClass =
-                            statusText.toLowerCase() === "accepted"
-                              ? "status-accepted"
-                              : statusText.toLowerCase() === "rejected"
-                              ? "status-rejected"
-                              : "status-default";
-                          return (
-                            <div key={request.requsetID} className="request-subitem">
-                              <p className="reader-name">Requested by: {request.readerName || "Unknown"}</p>
-                              <p className={`status ${statusClass}`}>
-                                Status: {statusText}
-                              </p>
-                              {isPending && (
-                                <div className="action-buttons">
-                                  <button
-                                    className="approve-button"
-                                    onClick={() => handleAcceptRequest(request.requsetID, request.bookPostID, request.readerID)}
-                                  >
-                                    Accept
-                                  </button>
-                                  <button
-                                    className="reject-button"
-                                    onClick={() => handleRejectRequest(request.requsetID, request.bookPostID, request.readerID)}
-                                  >
-                                    Reject
-                                  </button>
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })
-                      ) : (
-                        <p className="no-requests">No requests for this book.</p>
-                      )}
+      <div className="container">
+        <div className="button-container">
+          <Link to="/BookPost">
+            <button className="book_post_button">post book</button>
+          </Link>
+        </div>
+        <div className="borrow-requests">
+          <h2>Your Book Posts</h2>
+          {bookPosts.length === 0 ? (
+            <p className="no-posts">No book posts found.</p>
+          ) : (
+            <ul className="request-list">
+              {bookPosts.map((post) => {
+                const associatedRequests = requests.filter((req) => req?.bookPostID === post?.bookPostID);
+                return (
+                  <li key={post.bookPostID} className="request-item">
+                    <div className="request-details">
+                      <div className="request-info">
+                        <p className="book-title">Book: {post.title || "Untitled"}</p>
+                        <p className="book-isbn">ISBN: {post.isbn || "N/A"}</p>
+                        <p className="book-price">Price: ${post.price || "N/A"}</p>
+                        <button
+                          className="update-button"
+                          onClick={() => handleUpdatePost(post)}
+                        >
+                          Update
+                        </button>
+                        {associatedRequests.length > 0 ? (
+                          associatedRequests.map((request) => {
+                            const isPending = request?.requsetStatus?.toLowerCase() === "pending";
+                            const statusText = request.requsetStatus === "Returned" ? "Available" : request.requsetStatus || "N/A";
+                            const statusClass =
+                              statusText.toLowerCase() === "accepted"
+                                ? "status-accepted"
+                                : statusText.toLowerCase() === "rejected"
+                                ? "status-rejected"
+                                : "status-default";
+                            return (
+                              <div key={request.requsetID} className="request-subitem">
+                                <p className="reader-name">Requested by: {request.readerName || "Unknown"}</p>
+                                <p className={`status ${statusClass}`}>
+                                  Status: {statusText}
+                                </p>
+                                {isPending && (
+                                  <div className="action-buttons">
+                                    <button
+                                      className="approve-button"
+                                      onClick={() => handleAcceptRequest(request.requsetID, request.bookPostID, request.readerID)}
+                                    >
+                                      Accept
+                                    </button>
+                                    <button
+                                      className="reject-button"
+                                      onClick={() => handleRejectRequest(request.requsetID, request.bookPostID, request.readerID)}
+                                    >
+                                      Reject
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })
+                        ) : (
+                          <p className="no-requests">No requests for this book.</p>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        )}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

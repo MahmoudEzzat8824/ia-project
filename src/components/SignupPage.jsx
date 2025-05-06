@@ -5,6 +5,11 @@ import PasswordInput from './PasswordInput';
 import PhoneNumberInput from './PhoneNumberInput';
 import UsernameInput from './UsernameInput';
 import SSNInput from './SSNInput';
+import '../styles/auth/auth-common.css'; // Shared auth styles
+import '../styles/auth/signup.css'; // Signup page specific styles
+import '../styles/auth/components/buttons.css'; // Button styles
+import '../styles/auth/components/forms.css'; // Form container styles
+import '../styles/auth/components/inputs.css'; // Input field styles
 
 function SignupPage({ setPage }) {
   const [email, setEmail] = useState('');

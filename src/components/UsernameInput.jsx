@@ -1,3 +1,6 @@
+
+import '../styles/auth/components/inputs.css'; // Input field styles
+
 function UsernameInput({ userName, setuserName, className }) {
   return (
     <div className={className}>

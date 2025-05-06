@@ -3,7 +3,7 @@ import TopBar from "../components/top_bar";
 import UserName from '../components/UserName';
 import { Link } from 'react-router-dom';
 import authService from '../services/auth.service';
-import '../index.css';
+import '../Styles/ProfilePage.css'
 
 
 
@@ -71,7 +71,6 @@ function ProfilePage() {
   return (
     <>
       <TopBar />
-      <UserName />
       <div className="borrow-requests">
           <h2>Your Borrow Requests</h2>
           {loading && <p className="loading">Loading requests...</p>}

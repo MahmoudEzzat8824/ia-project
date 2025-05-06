@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { FaSearch } from 'react-icons/fa';
 import authService from '../services/auth.service';
-import '../index.css';
+import '../Styles/SearchBar.css'
+
 
 export const SearchBar = ({ setResults }) => {
   const [searchParams, setSearchParams] = useState({

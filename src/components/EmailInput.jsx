@@ -1,3 +1,4 @@
+import '../styles/auth/components/inputs.css'; // Input field styles
 function EmailInput({ email, setEmail, className }) {
     return (
       <div className={className}>

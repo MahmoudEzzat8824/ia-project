@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SearchBar } from './SearchBar.jsx';
+import TopBar from "../components/top_bar";
 import axios from 'axios'; // Import axios
-import '../index.css';
+import '../Styles/SearchBar.css';
+import '../Styles/Search.css'
 
 function Search() {
   const [results, setResults] = useState([]);
@@ -112,6 +114,8 @@ function Search() {
   };
 
   return (
+    <>
+    <TopBar />
     <div className="search-page min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 py-10 px-4 sm:px-6 lg:px-8">
       <h1 className="text-4xl font-bold text-blue-700 mb-10 text-center tracking-tight animate-fade-in">
         Search Books
@@ -200,6 +204,7 @@ function Search() {
         </div>
       )}
     </div>
+    </>
   );
 }
 

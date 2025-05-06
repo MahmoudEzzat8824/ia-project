@@ -1,40 +1,34 @@
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 import TopBar from "../components/top_bar";
-import UserNotLoggedCard from "../components/UserNotLoggedCard"; 
+import UserNotLoggedCard from "../components/UserNotLoggedCard";
 import Posts from "../components/Posts";
-
-
+import '../Styles/HomePageWithLogin.css';
 
 function HomePageWithoutLogin({ currentUser, books, onLoginClick }) {
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     authService.refreshTokenIfNeeded();
-  //   }, 60000); // Check every 60 seconds
-
-  //   return () => clearInterval(interval);
-  // }, []);
-  
   const navigate = useNavigate();
-  
-  if (localStorage.getItem("token")) {
-        localStorage.removeItem("token");
-    }
 
   useEffect(() => {
+    console.log("HomePageWithoutLogin: Checking token");
     const token = localStorage.getItem("token");
     if (token) {
+      console.log("HomePageWithoutLogin: Token found, navigating to HomePageWithLogin");
       navigate("/HomePageWithLogin");
+    } else {
+      console.log("HomePageWithoutLogin: No token found, staying on page");
     }
   }, [navigate]);
-    
+
+  console.log("HomePageWithoutLogin: Rendering", { currentUser, books, onLoginClick });
 
   return (
     <>
       <TopBar />
-      <div className="main-page">
-        <UserNotLoggedCard />
-        <Posts />
+      <div className="HomePageWithLogin"> {/* Added wrapper to match CSS selector */}
+        <div className="main-page">
+          <UserNotLoggedCard onLoginClick={onLoginClick} />
+          <Posts books={books} />
+        </div>
       </div>
     </>
   );

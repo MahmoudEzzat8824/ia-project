@@ -1,0 +1,227 @@
+/* Profile Page - Fancy White-Blue Theme */
+.borrow-requests {
+    max-width: 1000px;
+    margin: 4rem auto; /* Increased margin-top to clear fixed TopBar */
+    padding: 2.5rem;
+    background: linear-gradient(135deg, #e6f0ff 0%, #f5faff 100%); /* Subtle blue gradient */
+    color: #1e3a8a; /* Dark blue text */
+    font-family: 'Georgia', serif;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    position: relative;
+    overflow: hidden;
+    box-sizing: border-box;
+    z-index: 10; /* Below TopBar (z-index: 1000) */
+    margin-top: 90px;
+  }
+  
+  /* Decorative Background Element */
+  .borrow-requests::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.2), transparent 70%);
+    z-index: 0;
+    pointer-events: none;
+  }
+  
+  /* Borrow Requests Heading */
+  .borrow-requests h2 {
+    font-size: 2rem;
+    color: #1e3a8a;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-weight: bold;
+    letter-spacing: 0.3px;
+  }
+  
+  /* Loading and Error Messages */
+  .loading,
+  .error {
+    font-size: 1.2rem;
+    text-align: center;
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+  }
+  
+  .loading {
+    color: #3b82f6; /* Blue */
+    background: rgba(255, 255, 255, 0.8);
+  }
+  
+  .error {
+    color: #dc2626; /* Red for errors */
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid #fecaca;
+  }
+  
+  /* Request List */
+  .request-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  /* Request Item */
+  .request-item {
+    background: rgba(255, 255, 255, 0.85); /* Glassmorphism effect */
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    border: 1px solid rgba(191, 219, 254, 0.5);
+    margin: 1rem 0;
+    padding: 1.5rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    width: 100%;
+    max-width: 100%; /* Prevent overflow */
+    box-sizing: border-box;
+  }
+  
+  .request-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.2);
+  }
+  
+  /* Request Details */
+  .request-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .request-info {
+    flex: 1;
+  }
+  
+  .request-info p {
+    font-size: 1.1rem;
+    color: #1e40af; /* Default blue */
+    margin: 0.5rem 0;
+    font-style: italic;
+  }
+  
+  .request-info p:first-child {
+    font-weight: bold;
+  }
+  
+  /* Status Styling (Generic for all statuses) */
+  .request-info p:nth-child(2) {
+    color: #ffffff; /* White text for all statuses */
+    background: rgba(59, 130, 246, 0.9); /* Blue background */
+    padding: 0.3rem 0.8rem;
+    border-radius: 6px;
+    display: inline-block;
+  }
+  
+  /* Fallback for Unknown Status */
+  .request-info p:nth-child(2):where(:not(:empty)) {
+    color: #374151; /* Dark gray for unknown */
+    background: rgba(255, 255, 255, 0.8);
+    padding: 0.3rem 0.8rem;
+    border-radius: 6px;
+    display: inline-block;
+  }
+  
+  /* Return Button */
+  .return-button {
+    padding: 0.75rem 1.5rem;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 50px; /* Pill-shaped */
+    background: linear-gradient(90deg, #3b82f6, #60a5fa); /* Blue gradient */
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .return-button:hover {
+    background: linear-gradient(90deg, #2563eb, #3b82f6);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+  }
+  
+  .return-button:disabled {
+    background: #93c5fd;
+    cursor: not-allowed;
+    transform: none;
+  }
+  
+  /* No Requests Message */
+  .borrow-requests > p {
+    font-size: 1.2rem;
+    color: #374151;
+    text-align: center;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    margin: 1rem 0;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .borrow-requests {
+      padding: 1.5rem;
+      margin: 3rem auto; /* Adjusted for mobile TopBar */
+    }
+  
+    .borrow-requests h2 {
+      font-size: 1.8rem;
+    }
+  
+    .request-details {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .return-button {
+      width: 100%;
+      text-align: center;
+    }
+  
+    .request-info p {
+      font-size: 1rem;
+    }
+  
+    .request-info p:nth-child(2) {
+      font-size: 0.95rem;
+      padding: 0.2rem 0.6rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .borrow-requests h2 {
+      font-size: 1.5rem;
+    }
+  
+    .request-item {
+      padding: 1rem;
+    }
+  
+    .return-button {
+      font-size: 1rem;
+      padding: 0.6rem 1.2rem;
+    }
+  
+    .loading,
+    .error,
+    .borrow-requests > p {
+      font-size: 1rem;
+    }
+  
+    .request-info p {
+      font-size: 0.9rem;
+    }
+  
+    .request-info p:nth-child(2) {
+      font-size: 0.85rem;
+      padding: 0.2rem 0.5rem;
+    }
+  }

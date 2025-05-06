@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import  '../Styles/BookPostCard.css'
 
 const BookPostCard = ({ book }) => {
   const navigate = useNavigate();
