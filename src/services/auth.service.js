@@ -1,8 +1,8 @@
 import axios from "axios";
-import { useState } from "react";
-import { data } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 
+// Ensure SignalR is available
+const signalR = window.signalR;
 
 const API_URL = "https://localhost:7200";
 
@@ -10,14 +10,98 @@ let readerIdToShow = null;
 let readerNameToShow = null;
 let readerEmailToShow = null;
 
+// SignalR Connection Setup
+let connection = null;
+let isStarting = false; // Flag to prevent multiple start attempts
+
+const initializeSignalR = () => {
+  if (connection) return;
+
+  const token = JSON.parse(localStorage.getItem("token"))?.token;
+  if (!token) {
+    console.error("No token found for SignalR connection");
+    return;
+  }
+
+  connection = new signalR.HubConnectionBuilder()
+    .withUrl(`${API_URL}/notificationHub`, {
+      accessTokenFactory: () => token,
+      transport: signalR.HttpTransportType.WebSockets,
+    })
+    .configureLogging(signalR.LogLevel.Debug)
+    .build();
+
+  // Handle incoming notifications
+  connection.on("ReceiveNotification", (message) => {
+  if (message === "Test notification") return; // Remove or ignore it
+  console.log("Notification received:", message);
+  const event = new CustomEvent("notificationReceived", { detail: message });
+  window.dispatchEvent(event);
+});
+
+
+  // Handle connection close
+  connection.onclose(async (error) => {
+    console.error("SignalR connection closed:", error);
+    if (!isStarting) {
+      await startSignalR();
+    }
+  });
+};
+
+const startSignalR = async () => {
+  if (isStarting) {
+    console.log("SignalR start already in progress");
+    return;
+  }
+
+  if (!connection) {
+    initializeSignalR();
+  }
+
+  // Check connection state
+  if (connection.state !== signalR.HubConnectionState.Disconnected) {
+    console.log(`SignalR connection is in ${connection.state} state, cannot start`);
+    return;
+  }
+
+  isStarting = true;
+  try {
+    await connection.start();
+    console.log("SignalR Connected.");
+  } catch (err) {
+    console.error("SignalR Connection failed:", err.message);
+    // Retry after delay, but only if not already starting
+    setTimeout(async () => {
+      if (!isStarting) {
+        await startSignalR();
+      }
+    }, 5000);
+  } finally {
+    isStarting = false;
+  }
+};
+
+const stopSignalR = async () => {
+  if (connection && connection.state !== signalR.HubConnectionState.Disconnected) {
+    try {
+      await connection.stop();
+      console.log("SignalR Disconnected.");
+    } catch (err) {
+      console.error("SignalR Disconnection failed:", err.message);
+    }
+  }
+  connection = null;
+  isStarting = false;
+};
+
+// Admin Login
 const AdminLogin = async (adminName, passwordHash) => {
   try {
     const response = await axios.post(
       `${API_URL}/api/admin/admin/login`,
       { adminName, passwordHash },
-      {
-        withCredentials: true // ⬅️ This is required for sending/receiving cookies
-      }
+      { withCredentials: true }
     );
 
     if (response.data.token) {
@@ -25,9 +109,13 @@ const AdminLogin = async (adminName, passwordHash) => {
         "token",
         JSON.stringify({
           token: response.data.token,
-          role: "admin"
+          role: "admin",
         })
       );
+      // Initialize and start SignalR after successful login
+      await stopSignalR(); // Ensure any existing connection is stopped
+      initializeSignalR();
+      await startSignalR();
     }
 
     return response.data;
@@ -37,76 +125,62 @@ const AdminLogin = async (adminName, passwordHash) => {
   }
 };
 
+// Create Admin
 const createAdmin = async (adminName, passwordHash) => {
   try {
-    // Validate inputs
     if (!adminName || !passwordHash) {
-      throw new Error('adminName and passwordHash are required');
+      throw new Error("adminName and passwordHash are required");
     }
 
-    // Retrieve token from localStorage
-    const tokenData = localStorage.getItem('token');
+    const tokenData = localStorage.getItem("token");
     if (!tokenData) {
-      throw new Error('No token found');
+      throw new Error("No token found");
     }
 
     let token;
     try {
       token = JSON.parse(tokenData)?.token;
     } catch (e) {
-      throw new Error('Invalid token format');
+      throw new Error("Invalid token format");
     }
 
     if (!token) {
-      throw new Error('Token is missing');
+      throw new Error("Token is missing");
     }
 
-    // Make API request
     const response = await axios.post(
-      `${API_URL}/api/admin/create`, // Use template literal with backticks
-      {
-        adminName,
-        passwordHash,
-      },
+      `${API_URL}/api/admin/create`,
+      { adminName, passwordHash },
       {
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`, // Use template literal with backticks
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
       }
     );
 
     return response.data;
   } catch (error) {
-    // Enhanced error handling
     if (error.response) {
-      // Server responded with a status other than 2xx
-      console.error('Create Admin API error:', error.response.data);
-      throw new Error(error.response.data.message || 'Failed to create admin');
+      console.error("Create Admin API error:", error.response.data);
+      throw new Error(error.response.data.message || "Failed to create admin");
     } else if (error.request) {
-      // No response received
-      console.error('Create Admin API error: No response received', error.request);
-      throw new Error('No response from server');
+      console.error("Create Admin API error: No response received", error.request);
+      throw new Error("No response from server");
     } else {
-      // Other errors
-      console.error('Create Admin API error:', error.message);
+      console.error("Create Admin API error:", error.message);
       throw new Error(error.message);
     }
   }
 };
 
-
+// Book Owner Login
 const BookOwnerLogin = async (bookOwnerName, password) => {
   try {
     const response = await axios.post(
       `${API_URL}/api/bookowner/login`,
-      {
-        bookOwnerName,
-        password,
-      },
-      {
-        withCredentials: true // ⬅️ Required for sending/receiving cookies
-      }
+      { bookOwnerName, password },
+      { withCredentials: true }
     );
 
     if (response.data.token) {
@@ -115,9 +189,13 @@ const BookOwnerLogin = async (bookOwnerName, password) => {
         JSON.stringify({
           token: response.data.token,
           role: "book_owner",
-          bookOwnerID: response.data.user.bookOwnerID
+          bookOwnerID: response.data.user.bookOwnerID,
         })
       );
+      // Initialize and start SignalR after successful login
+      await stopSignalR();
+      initializeSignalR();
+      await startSignalR();
     }
 
     return response.data;
@@ -127,18 +205,13 @@ const BookOwnerLogin = async (bookOwnerName, password) => {
   }
 };
 
-
+// Reader Login
 const ReaderLogin = async (readerName, password) => {
   try {
     const response = await axios.post(
       `${API_URL}/api/reader/reader/login`,
-      {
-        readerName,
-        password,
-      },
-      {
-        withCredentials: true // ⬅️ Enables sending/receiving cookies
-      }
+      { readerName, password },
+      { withCredentials: true }
     );
 
     if (response.data.token) {
@@ -149,9 +222,13 @@ const ReaderLogin = async (readerName, password) => {
           role: "reader",
           readerID: response.data.user.readerID,
           readerName: response.data.user.readerName,
-          readerEmail: response.data.user.email
+          readerEmail: response.data.user.email,
         })
       );
+      // Initialize and start SignalR after successful login
+      await stopSignalR();
+      initializeSignalR();
+      await startSignalR();
     }
 
     return response.data;
@@ -161,12 +238,13 @@ const ReaderLogin = async (readerName, password) => {
   }
 };
 
-
-
-const Logout = () => {
+// Logout
+const Logout = async () => {
+  await stopSignalR();
   localStorage.removeItem("token");
 };
 
+// Fetch Book Owners
 const fetchBookOwners = async () => {
   try {
     const token = JSON.parse(localStorage.getItem("token"))?.token;
@@ -176,7 +254,7 @@ const fetchBookOwners = async () => {
 
     const response = await axios.get(`${API_URL}/api/admin/ManageBookOwners`, {
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
     });
@@ -188,6 +266,7 @@ const fetchBookOwners = async () => {
   }
 };
 
+// Handle Action
 const handleAction = async (id, action) => {
   try {
     const token = JSON.parse(localStorage.getItem("token"))?.token;
@@ -200,16 +279,15 @@ const handleAction = async (id, action) => {
       null,
       {
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       }
     );
 
-    // Refetch book owners after the action
     const updatedResponse = await axios.get(`${API_URL}/api/admin/ManageBookOwners`, {
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
     });
@@ -221,34 +299,36 @@ const handleAction = async (id, action) => {
   }
 };
 
+// Search Books
 const searchBooks = async (params) => {
   const queryParams = Object.entries(params)
-    .filter(([_, value]) => value && value.trim() !== '')
+    .filter(([_, value]) => value && value.trim() !== "")
     .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
-    .join('&');
+    .join("&");
   try {
-    const token = JSON.parse(localStorage.getItem('token'))?.token;
+    const token = JSON.parse(localStorage.getItem("token"))?.token;
     const headers = token ? { Authorization: `Bearer ${token}` } : {};
     const response = await axios.get(`${API_URL}/api/BookPost/Search?${queryParams}`, { headers });
     return response.data;
   } catch (error) {
-    console.warn('Error searching books:', error.response?.data || error.message);
+    console.warn("Error searching books:", error.response?.data || error.message);
     throw error;
   }
 };
 
+// Check Book Availability
 const checkBookAvailability = async (bookPostId) => {
   try {
-    const token = JSON.parse(localStorage.getItem('token'))?.token;
+    const token = JSON.parse(localStorage.getItem("token"))?.token;
     if (!token) {
-      throw new Error('No token found');
+      throw new Error("No token found");
     }
     if (!bookPostId) {
-      throw new Error('Invalid bookPostId');
+      throw new Error("Invalid bookPostId");
     }
     const response = await axios.get(`${API_URL}/api/BookPost/available/${bookPostId}`, {
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
     });
@@ -262,9 +342,10 @@ const checkBookAvailability = async (bookPostId) => {
   }
 };
 
+// Get Book Details
 const getBookDetails = async (bookPostId) => {
   try {
-    const token = JSON.parse(localStorage.getItem('token'))?.token;
+    const token = JSON.parse(localStorage.getItem("token"))?.token;
     const headers = token ? { Authorization: `Bearer ${token}` } : {};
     const response = await axios.get(`${API_URL}/api/BookPost/${bookPostId}`, { headers });
     return response.data;
@@ -274,6 +355,7 @@ const getBookDetails = async (bookPostId) => {
   }
 };
 
+// Fetch Borrow Requests
 const fetchBorrowRequests = async (readerID) => {
   try {
     const token = JSON.parse(localStorage.getItem("token"))?.token;
@@ -283,23 +365,20 @@ const fetchBorrowRequests = async (readerID) => {
 
     const response = await axios.get(`${API_URL}/api/reader/user/${readerID}`, {
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
     });
 
     console.log("Raw Borrow Requests API Response:", response.data);
-
-    // Handle different possible response structures
-    return Array.isArray(response.data) 
-      ? response.data 
-      : response.data.borrowRequests || [];
+    return Array.isArray(response.data) ? response.data : response.data.borrowRequests || [];
   } catch (error) {
     console.error("Fetch Borrow Requests API error:", error);
     throw error;
   }
 };
 
+// Return Book
 const returnBook = async (requestID, bookPostID, readerID) => {
   try {
     const token = JSON.parse(localStorage.getItem("token"))?.token;
@@ -310,14 +389,14 @@ const returnBook = async (requestID, bookPostID, readerID) => {
     const response = await axios.post(
       `${API_URL}/api/reader/return`,
       {
-        requsetID: requestID, // Use requsetID as per schema
+        requsetID: requestID,
         bookPostID: bookPostID,
         readerID: readerID,
-        requsetStatus: "returned" // Use requsetStatus as per schema
+        requsetStatus: "returned",
       },
       {
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       }
@@ -330,6 +409,7 @@ const returnBook = async (requestID, bookPostID, readerID) => {
   }
 };
 
+// Fetch Book Posts by Owner
 const fetchBookPostsByOwner = async (bookOwnerID, signal) => {
   try {
     const token = JSON.parse(localStorage.getItem("token"))?.token;
@@ -339,7 +419,7 @@ const fetchBookPostsByOwner = async (bookOwnerID, signal) => {
 
     const response = await axios.get(`${API_URL}/api/bookowner/owner?bookOwnerId=${bookOwnerID}`, {
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
       signal,
@@ -351,6 +431,7 @@ const fetchBookPostsByOwner = async (bookOwnerID, signal) => {
   }
 };
 
+// Fetch Book Posts
 const fetchBookPosts = async (bookOwnerID, signal) => {
   try {
     const token = JSON.parse(localStorage.getItem("token"))?.token;
@@ -360,7 +441,7 @@ const fetchBookPosts = async (bookOwnerID, signal) => {
 
     const response = await axios.get(`${API_URL}/api/bookowner/posts/${bookOwnerID}`, {
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
       signal,
@@ -372,6 +453,7 @@ const fetchBookPosts = async (bookOwnerID, signal) => {
   }
 };
 
+// Accept Request
 const acceptRequest = async (requestId, bookPostId, readerId) => {
   try {
     const token = JSON.parse(localStorage.getItem("token"))?.token;
@@ -385,11 +467,11 @@ const acceptRequest = async (requestId, bookPostId, readerId) => {
         requsetID: requestId,
         bookPostID: bookPostId,
         readerID: readerId,
-        RequsetStatus: "Accepted" // Changed to match the server's expected field name
+        RequsetStatus: "Accepted",
       },
       {
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       }
@@ -404,6 +486,7 @@ const acceptRequest = async (requestId, bookPostId, readerId) => {
   }
 };
 
+// Reject Request
 const rejectRequest = async (requestId, bookPostId, readerId) => {
   try {
     const token = JSON.parse(localStorage.getItem("token"))?.token;
@@ -417,11 +500,11 @@ const rejectRequest = async (requestId, bookPostId, readerId) => {
         requsetID: requestId,
         bookPostID: bookPostId,
         readerID: readerId,
-        RequsetStatus: "Rejected" // Changed to match the server's expected field name
+        RequsetStatus: "Rejected",
       },
       {
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       }
@@ -436,10 +519,10 @@ const rejectRequest = async (requestId, bookPostId, readerId) => {
   }
 };
 
-// Helper: Parse JWT and get expiry
+// Parse JWT
 function parseJwt(token) {
   try {
-    const base64Payload = token.split('.')[1];
+    const base64Payload = token.split(".")[1];
     const decodedPayload = atob(base64Payload);
     return JSON.parse(decodedPayload);
   } catch (e) {
@@ -447,19 +530,18 @@ function parseJwt(token) {
   }
 }
 
-// Helper: Check if token expires within next 2 minutes
+// Check Token Expiry
 function isTokenExpiringSoon(token) {
   const payload = parseJwt(token);
   if (!payload || !payload.exp) return false;
   const now = Math.floor(Date.now() / 1000);
-  return payload.exp - now <= 120; // 2 minutes = 120 seconds
+  return payload.exp - now <= 120;
 }
 
-// Function: Refresh token and update storage/cookies
+// Refresh Token
 const refreshTokenIfNeeded = async () => {
-  
-  console.log("Token expired or expiring soon. Refreshing...");
-  const tokenStr = localStorage.getItem('token');
+  console.log("Checking token for refresh...");
+  const tokenStr = localStorage.getItem("token");
   if (!tokenStr) {
     console.error("No token found in localStorage.");
     return;
@@ -476,33 +558,33 @@ const refreshTokenIfNeeded = async () => {
   try {
     const decoded = jwtDecode(token);
     const exp = decoded.exp;
-    const now = Date.now() / 1000; // current time in seconds
+    const now = Date.now() / 1000;
 
-    // Refresh if token expires within 60 seconds
     if (exp - now < 60) {
       console.log("Token expired or expiring soon. Refreshing...");
 
-      const response = await await axios.post(
-        "https://localhost:7200/api/RefreshToken/refresh-token",
+      const response = await axios.post(
+        `${API_URL}/api/RefreshToken/refresh-token`,
         null,
         { withCredentials: true }
       );
-      
-      // Ensure the response contains the new token
+
       const newToken = response.data?.token;
-      console.log("New token received:", newToken);
       if (newToken) {
         console.log("New token received:", newToken);
         const newDecoded = jwtDecode(newToken);
 
-        // Update token object
         tokenObj.token = newToken;
-        localStorage.setItem('token', JSON.stringify(tokenObj));
+        localStorage.setItem("token", JSON.stringify(tokenObj));
 
-        // Set cookie with proper max-age
         const newExp = newDecoded.exp;
-        const maxAge = newExp - Math.floor(Date.now() / 1000); // in seconds
+        const maxAge = newExp - Math.floor(Date.now() / 1000);
         document.cookie = `refreshToken=${newToken}; path=/; max-age=${maxAge}; secure`;
+
+        // Reinitialize SignalR with new token
+        await stopSignalR();
+        initializeSignalR();
+        await startSignalR();
       } else {
         console.warn("No token received in the refresh response.");
       }
@@ -512,6 +594,7 @@ const refreshTokenIfNeeded = async () => {
   }
 };
 
+// Add Like
 const addLike = async (readerID, bookPostID, isLike) => {
   try {
     const token = JSON.parse(localStorage.getItem("token"))?.token;
@@ -521,14 +604,10 @@ const addLike = async (readerID, bookPostID, isLike) => {
 
     const response = await axios.post(
       `${API_URL}/api/reader/like`,
-      {
-        readerID,
-        bookPostID,
-        isLike
-      },
+      { readerID, bookPostID, isLike },
       {
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       }
@@ -541,6 +620,7 @@ const addLike = async (readerID, bookPostID, isLike) => {
   }
 };
 
+// Update Like
 const updateLike = async (readerID, bookPostID, isLike) => {
   try {
     const token = JSON.parse(localStorage.getItem("token"))?.token;
@@ -550,14 +630,10 @@ const updateLike = async (readerID, bookPostID, isLike) => {
 
     const response = await axios.put(
       `${API_URL}/api/reader/like`,
-      {
-        readerID,
-        bookPostID,
-        isLike
-      },
+      { readerID, bookPostID, isLike },
       {
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       }
@@ -570,6 +646,7 @@ const updateLike = async (readerID, bookPostID, isLike) => {
   }
 };
 
+// Remove Like
 const removeLike = async (readerID, bookPostID, isLike) => {
   try {
     const token = JSON.parse(localStorage.getItem("token"))?.token;
@@ -580,13 +657,9 @@ const removeLike = async (readerID, bookPostID, isLike) => {
     const response = await axios.delete(
       `${API_URL}/api/reader/like`,
       {
-        data: {
-          readerID,
-          bookPostID,
-          isLike
-        },
+        data: { readerID, bookPostID, isLike },
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       }
@@ -599,6 +672,7 @@ const removeLike = async (readerID, bookPostID, isLike) => {
   }
 };
 
+// Check Like
 const checkLike = async (readerID, bookPostID) => {
   try {
     const token = JSON.parse(localStorage.getItem("token"))?.token;
@@ -610,7 +684,7 @@ const checkLike = async (readerID, bookPostID) => {
       `${API_URL}/api/reader/check-like?readerID=${readerID}&bookPostID=${bookPostID}`,
       {
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       }
@@ -622,10 +696,6 @@ const checkLike = async (readerID, bookPostID) => {
     throw error;
   }
 };
-
-
-
-
 
 const authService = {
   AdminLogin,
@@ -649,6 +719,8 @@ const authService = {
   updateLike,
   removeLike,
   checkLike,
+  startSignalR,
+  stopSignalR,
   getReaderDetails: () => {
     const tokenData = JSON.parse(localStorage.getItem("token"));
     if (tokenData && tokenData.role === "reader") {
@@ -670,15 +742,13 @@ const authService = {
       return {
         bookOwnerId: tokenData.bookOwnerID || null,
         bookOwnerName: tokenData.bookOwnerName || null,
-        // readerEmail: tokenData.bookOwnerEmail || null,
       };
     }
     return {
       bookOwnerId: null,
       bookOwnerName: null,
-      // readerEmail: null,
     };
-  }
+  },
 };
 
 export default authService;

@@ -74,7 +74,7 @@ const AdminDashboard = () => {
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-gray-700">Password Hash</label>
+                <label className="block text-gray-700">Password</label>
                 <input
                   type="text"
                   value={passwordHash}
