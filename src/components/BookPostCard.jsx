@@ -4,7 +4,7 @@ import  '../Styles/BookPostCard.css'
 
 const BookPostCard = ({ book }) => {
   const navigate = useNavigate();
-  const token = localStorage.getItem("token"); // Get token once at the top
+  const token = localStorage.getItem("token"); 
 
   const coverSrc = book.coverPhoto
     ? `data:image/jpeg;base64,${book.coverPhoto}`

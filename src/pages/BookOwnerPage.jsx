@@ -1,11 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import TopBar from "../components/top_bar";
-import UserName from '../components/UserName';
 import { Link, useNavigate } from 'react-router-dom';
 import authService from '../services/auth.service';
 import '../Styles/BookOwnerPage.css';
 
 function BookOwnerPage() {
+  const [bookPosts, setBookPosts] = useState([]);
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
+  const isMounted = useRef(true);
+
   useEffect(() => {
     const interval = setInterval(() => {
       authService.refreshTokenIfNeeded();
@@ -14,53 +20,70 @@ function BookOwnerPage() {
     return () => clearInterval(interval);
   }, []);
 
-  const [bookPosts, setBookPosts] = useState([]);
-  const [requests, setRequests] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const navigate = useNavigate();
-
   useEffect(() => {
+    isMounted.current = true;
+
     const fetchData = async () => {
       try {
         const tokenData = JSON.parse(localStorage.getItem("token"));
         const bookOwnerID = tokenData?.bookOwnerID;
 
-        if (!tokenData || !bookOwnerID) {
-          setError("User not logged in. Redirecting to login...");
+        if (!tokenData || !bookOwnerID || !tokenData.token) {
+          setError("Invalid or missing token. Redirecting to login...");
           setTimeout(() => navigate('/login'), 2000);
           setLoading(false);
           return;
         }
 
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        const timeoutId = setTimeout(() => controller.abort(), 30000);
 
+        
         const postsResponse = await authService.fetchBookPosts(bookOwnerID, controller.signal);
+        console.log("Posts Response:", postsResponse);
         const postsArray = postsResponse?.posts && Array.isArray(postsResponse.posts) ? postsResponse.posts : [];
-        setBookPosts(postsArray);
+        if (isMounted.current) {
+          setBookPosts(postsArray);
+        }
 
+       
         const requestsResponse = await authService.fetchBookPostsByOwner(bookOwnerID, controller.signal);
+        console.log("Requests Response:", requestsResponse);
         const requestsArray = requestsResponse?.requests && Array.isArray(requestsResponse.requests) ? requestsResponse.requests : [];
-        // Remove duplicates based on bookPostID for requests
+
         const uniqueRequests = Array.from(
-          new Map(requestsArray.map(request => [(request.bookPostID || request.bookPostId), request])).values()
+          new Map(
+            requestsArray
+              .filter(request => request && (request.bookPostID || request.bookPostId) && request.readerID)
+              .map(request => [`${request.bookPostID || request.bookPostId}-${request.readerID}`, request])
+          ).values()
         );
-        setRequests(uniqueRequests);
+        if (isMounted.current) {
+          setRequests(uniqueRequests);
+        }
 
         clearTimeout(timeoutId);
-        setLoading(false);
+        if (isMounted.current) {
+          setLoading(false);
+        }
       } catch (err) {
-        setError(
-          err.name === 'AbortError'
-            ? "Request timed out."
-            : "Failed to fetch data: " + err.message
-        );
-        setLoading(false);
+        console.error("Fetch Error:", err, err.response);
+        if (isMounted.current) {
+          setError(
+            err.name === 'AbortError'
+              ? "Request timed out. Please check your network or server availability."
+              : `Failed to fetch data: ${err.message}${err.response ? ` (Status: ${err.response.status})` : ''}`
+          );
+          setLoading(false);
+        }
       }
     };
 
     fetchData();
+
+    return () => {
+      isMounted.current = false;
+    };
   }, [navigate]);
 
   const handleAcceptRequest = async (requestId, bookPostId, readerId) => {
@@ -73,7 +96,12 @@ function BookOwnerPage() {
       );
       setError(null);
     } catch (err) {
-      setError("Failed to accept request: " + err.message);
+      const errorMessage = err.response?.data?.message || err.message;
+      setError(
+        errorMessage === "Book is already borrowed"
+          ? "Cannot accept request: This book is already borrowed by another user."
+          : `Failed to accept request: ${errorMessage}`
+      );
     }
   };
 
@@ -93,6 +121,14 @@ function BookOwnerPage() {
 
   const handleUpdatePost = (post) => {
     navigate('/BookPost', { state: { bookPost: post } });
+  };
+
+  const isBookBorrowed = (bookPostId) => {
+    return requests.some(
+      (request) =>
+        (request.bookPostID === bookPostId || request.bookPostId === bookPostId) &&
+        request.requsetStatus?.toLowerCase() === "accepted"
+    );
   };
 
   if (loading) return <div className="loading">Loading...</div>;
@@ -115,6 +151,7 @@ function BookOwnerPage() {
             <ul className="request-list">
               {bookPosts.map((post) => {
                 const associatedRequests = requests.filter((req) => req?.bookPostID === post?.bookPostID);
+                const bookIsBorrowed = isBookBorrowed(post.bookPostID);
                 return (
                   <li key={post.bookPostID} className="request-item">
                     <div className="request-details">
@@ -128,6 +165,9 @@ function BookOwnerPage() {
                         >
                           Update
                         </button>
+                        {bookIsBorrowed && (
+                          <p className="status-borrowed">This book is currently borrowed.</p>
+                        )}
                         {associatedRequests.length > 0 ? (
                           associatedRequests.map((request) => {
                             const isPending = request?.requsetStatus?.toLowerCase() === "pending";
@@ -144,7 +184,7 @@ function BookOwnerPage() {
                                 <p className={`status ${statusClass}`}>
                                   Status: {statusText}
                                 </p>
-                                {isPending && (
+                                {isPending && !bookIsBorrowed && (
                                   <div className="action-buttons">
                                     <button
                                       className="approve-button"
@@ -159,6 +199,9 @@ function BookOwnerPage() {
                                       Reject
                                     </button>
                                   </div>
+                                )}
+                                {isPending && bookIsBorrowed && (
+                                  <p className="status-borrowed">Cannot accept: Book is already borrowed.</p>
                                 )}
                               </div>
                             );

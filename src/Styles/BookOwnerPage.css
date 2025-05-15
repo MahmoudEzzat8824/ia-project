@@ -1,14 +1,14 @@
-/* Base Styles */
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #333;
-  padding-top: 70px; /* Ensure content starts below fixed TopBar */
+  padding-top: 70px; 
 }
 
-/* Fixed TopBar Adjustment */
+
 .button-container {
   background: linear-gradient(to right, #f8f9fa, #ffffff);
   padding: 15px 0;
@@ -29,7 +29,7 @@
   background: linear-gradient(to bottom, #667eea, #764ba2);
 }
 
-/* Enhanced Post Book Button */
+
 .book_post_button {
   position: relative;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -83,7 +83,7 @@
   opacity: 0.1;
 }
 
-/* Responsive adjustments */
+
 @media (max-width: 768px) {
   .button-container {
     text-align: center;
@@ -104,7 +104,7 @@
   }
 }
 
-/* Main Content Area */
+
 .borrow-requests {
   background-color: #f8f9fa;
   border-radius: 12px;
@@ -112,7 +112,7 @@
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
   margin-bottom: 40px;
   border: 1px solid #eaeaea;
-  min-height: 200px; /* Ensure section is visible even if empty */
+  min-height: 200px;
 }
 
 .borrow-requests h2 {
@@ -134,7 +134,7 @@
   background: linear-gradient(90deg, #667eea, #764ba2);
 }
 
-/* Enhanced Request List */
+
 .request-list {
   list-style: none;
   padding: 0;
@@ -170,7 +170,7 @@
   background: linear-gradient(to bottom, #667eea, #764ba2);
 }
 
-/* Book Info Section */
+
 .book-title {
   font-size: 1.3rem;
   font-weight: bold;
@@ -211,7 +211,7 @@
   border-radius: 8px;
   padding: 15px;
   position: relative;
-  display: block; /* Ensure subitem is visible */
+  display: block; 
 }
 
 .request-subitem::before {
@@ -239,7 +239,7 @@
   content: "👤";
 }
 
-/* Enhanced Status Styles */
+
 .status {
   display: inline-block;
   padding: 5px 12px;
@@ -268,12 +268,12 @@
   border: 1px solid #ffb3b3;
 }
 
-/* Fancy Action Buttons */
+
 .action-buttons {
   display: flex;
   gap: 12px;
   margin-top: 15px;
-  flex-wrap: wrap; /* Prevent overflow on small screens */
+  flex-wrap: wrap; 
 }
 
 .approve-button, .reject-button, .update-button {
@@ -333,7 +333,7 @@
   content: "✕";
 }
 
-/* Empty States */
+
 .no-posts, .no-requests {
   color: #6c757d;
   font-style: italic;
@@ -345,7 +345,7 @@
   margin: 20px 0;
 }
 
-/* Loading and Error States */
+
 .loading, .error {
   padding: 25px;
   text-align: center;
@@ -379,7 +379,7 @@
   100% { transform: rotate(360deg); }
 }
 
-/* Responsive Design */
+
 @media (max-width: 768px) {
   .container {
     padding: 0 15px;
@@ -412,4 +412,10 @@
   .request-item::before {
     width: 3px;
   }
+}
+
+.status-borrowed {
+  color: #d32f2f; 
+  font-weight: bold;
+  margin-top: 8px;
 }

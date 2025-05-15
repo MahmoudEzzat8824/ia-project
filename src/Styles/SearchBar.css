@@ -1,4 +1,4 @@
-/* SearchBar Component - Fancy White-Blue Theme */
+
 .search-bar {
     max-width: 1200px;
     margin: 2rem auto;
@@ -12,7 +12,7 @@
     font-family: 'Georgia', serif;
   }
   
-  /* Decorative Background Element */
+ 
   .search-bar::before {
     content: '';
     position: absolute;
@@ -25,22 +25,22 @@
     pointer-events: none;
   }
   
-  /* Input Wrapper (Grid Container) */
+
   .input-wrapper {
     display: grid;
     gap: 1rem;
     width: 100%;
-    max-width: 100%; /* Prevent overflow */
+    max-width: 100%; 
     box-sizing: border-box;
     position: relative;
-    z-index: 1; /* Above decorative background */
+    z-index: 1; 
   }
   
-  /* Input Group (Icon + Input) */
+ 
   .input-group {
     display: flex;
     align-items: center;
-    background: rgba(255, 255, 255, 0.85); /* Glassmorphism effect */
+    background: rgba(255, 255, 255, 0.85); 
     backdrop-filter: blur(10px);
     border-radius: 8px;
     border: 1px solid rgba(191, 219, 254, 0.5);
@@ -54,26 +54,26 @@
     transform: translateY(-2px);
   }
   
-  /* Search Icon */
+  
   .search-icon {
-    color: #3b82f6; /* Vibrant blue */
+    color: #3b82f6; 
     font-size: 1.2rem;
     margin-right: 0.5rem;
     transition: color 0.3s ease, transform 0.3s ease;
   }
   
   .input-group:hover .search-icon {
-    color: #2563eb; /* Darker blue on hover */
+    color: #2563eb;
     transform: scale(1.1);
   }
   
-  /* Input Fields */
+  
   .input-group input {
     flex: 1;
     padding: 0.5rem;
     border: none;
     background: transparent;
-    color: #1e3a8a; /* Dark blue text */
+    color: #1e3a8a; 
     font-size: 1.1rem;
     font-family: 'Georgia', serif;
     outline: none;
@@ -81,30 +81,30 @@
   }
   
   .input-group input::placeholder {
-    color: #93c5fd; /* Light blue placeholder */
+    color: #93c5fd; 
     font-style: italic;
   }
   
   .input-group input:focus {
     outline: none;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5); /* Blue focus ring */
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
   }
   
   /* Number Input Specifics */
   .input-group input[type="number"] {
-    -moz-appearance: textfield; /* Remove Firefox number spinners */
+    -moz-appearance: textfield; 
   }
   
   .input-group input[type="number"]::-webkit-inner-spin-button,
   .input-group input[type="number"]::-webkit-outer-spin-button {
-    -webkit-appearance: none; /* Remove Chrome number spinners */
+    -webkit-appearance: none; 
     margin: 0;
   }
   
   /* Responsive Design */
   @media (min-width: 768px) {
     .input-wrapper {
-      grid-template-columns: repeat(2, 1fr); /* 2 columns on medium screens */
+      grid-template-columns: repeat(2, 1fr); 
     }
   
     .search-bar {
@@ -114,7 +114,7 @@
   
   @media (min-width: 1024px) {
     .input-wrapper {
-      grid-template-columns: repeat(4, 1fr); /* 4 columns on large screens */
+      grid-template-columns: repeat(4, 1fr); 
     }
   
     .input-group {

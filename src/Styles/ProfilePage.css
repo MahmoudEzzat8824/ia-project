@@ -1,4 +1,4 @@
-/* Profile Page - Fancy White-Blue Theme */
+
 .borrow-requests {
     max-width: 1000px;
     margin: 4rem auto; /* Increased margin-top to clear fixed TopBar */
@@ -11,11 +11,11 @@
     position: relative;
     overflow: hidden;
     box-sizing: border-box;
-    z-index: 10; /* Below TopBar (z-index: 1000) */
+    z-index: 10; 
     margin-top: 90px;
   }
   
-  /* Decorative Background Element */
+
   .borrow-requests::before {
     content: '';
     position: absolute;
@@ -28,7 +28,7 @@
     pointer-events: none;
   }
   
-  /* Borrow Requests Heading */
+  
   .borrow-requests h2 {
     font-size: 2rem;
     color: #1e3a8a;
@@ -38,7 +38,7 @@
     letter-spacing: 0.3px;
   }
   
-  /* Loading and Error Messages */
+  
   .loading,
   .error {
     font-size: 1.2rem;
@@ -59,7 +59,7 @@
     border: 1px solid #fecaca;
   }
   
-  /* Request List */
+  
   .request-list {
     list-style: none;
     padding: 0;
@@ -68,7 +68,7 @@
     box-sizing: border-box;
   }
   
-  /* Request Item */
+  
   .request-item {
     background: rgba(255, 255, 255, 0.85); /* Glassmorphism effect */
     backdrop-filter: blur(10px);
@@ -78,7 +78,7 @@
     padding: 1.5rem;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     width: 100%;
-    max-width: 100%; /* Prevent overflow */
+    max-width: 100%; 
     box-sizing: border-box;
   }
   
@@ -87,7 +87,7 @@
     box-shadow: 0 6px 20px rgba(59, 130, 246, 0.2);
   }
   
-  /* Request Details */
+  
   .request-details {
     display: flex;
     justify-content: space-between;
@@ -102,7 +102,7 @@
   
   .request-info p {
     font-size: 1.1rem;
-    color: #1e40af; /* Default blue */
+    color: #1e40af;
     margin: 0.5rem 0;
     font-style: italic;
   }
@@ -111,31 +111,30 @@
     font-weight: bold;
   }
   
-  /* Status Styling (Generic for all statuses) */
+  
   .request-info p:nth-child(2) {
-    color: #ffffff; /* White text for all statuses */
-    background: rgba(59, 130, 246, 0.9); /* Blue background */
+    color: #ffffff; 
+    background: rgba(59, 130, 246, 0.9); 
     padding: 0.3rem 0.8rem;
     border-radius: 6px;
     display: inline-block;
   }
   
-  /* Fallback for Unknown Status */
   .request-info p:nth-child(2):where(:not(:empty)) {
-    color: #374151; /* Dark gray for unknown */
+    color: #374151; 
     background: rgba(255, 255, 255, 0.8);
     padding: 0.3rem 0.8rem;
     border-radius: 6px;
     display: inline-block;
   }
   
-  /* Return Button */
+  
   .return-button {
     padding: 0.75rem 1.5rem;
     font-size: 1.1rem;
     border: none;
-    border-radius: 50px; /* Pill-shaped */
-    background: linear-gradient(90deg, #3b82f6, #60a5fa); /* Blue gradient */
+    border-radius: 50px; 
+    background: linear-gradient(90deg, #3b82f6, #60a5fa); 
     color: #ffffff;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -154,7 +153,7 @@
     transform: none;
   }
   
-  /* No Requests Message */
+  
   .borrow-requests > p {
     font-size: 1.2rem;
     color: #374151;
@@ -165,11 +164,11 @@
     margin: 1rem 0;
   }
   
-  /* Responsive Design */
+  
   @media (max-width: 768px) {
     .borrow-requests {
       padding: 1.5rem;
-      margin: 3rem auto; /* Adjusted for mobile TopBar */
+      margin: 3rem auto;
     }
   
     .borrow-requests h2 {

@@ -95,7 +95,7 @@ const stopSignalR = async () => {
   isStarting = false;
 };
 
-// Admin Login
+
 const AdminLogin = async (adminName, passwordHash) => {
   try {
     const response = await axios.post(
@@ -238,13 +238,13 @@ const ReaderLogin = async (readerName, password) => {
   }
 };
 
-// Logout
+
 const Logout = async () => {
   await stopSignalR();
   localStorage.removeItem("token");
 };
 
-// Fetch Book Owners
+
 const fetchBookOwners = async () => {
   try {
     const token = JSON.parse(localStorage.getItem("token"))?.token;
@@ -266,7 +266,7 @@ const fetchBookOwners = async () => {
   }
 };
 
-// Handle Action
+
 const handleAction = async (id, action) => {
   try {
     const token = JSON.parse(localStorage.getItem("token"))?.token;
@@ -299,7 +299,7 @@ const handleAction = async (id, action) => {
   }
 };
 
-// Search Books
+
 const searchBooks = async (params) => {
   const queryParams = Object.entries(params)
     .filter(([_, value]) => value && value.trim() !== "")
@@ -316,7 +316,7 @@ const searchBooks = async (params) => {
   }
 };
 
-// Check Book Availability
+
 const checkBookAvailability = async (bookPostId) => {
   try {
     const token = JSON.parse(localStorage.getItem("token"))?.token;
@@ -342,7 +342,7 @@ const checkBookAvailability = async (bookPostId) => {
   }
 };
 
-// Get Book Details
+
 const getBookDetails = async (bookPostId) => {
   try {
     const token = JSON.parse(localStorage.getItem("token"))?.token;
@@ -355,7 +355,7 @@ const getBookDetails = async (bookPostId) => {
   }
 };
 
-// Fetch Borrow Requests
+
 const fetchBorrowRequests = async (readerID) => {
   try {
     const token = JSON.parse(localStorage.getItem("token"))?.token;
@@ -378,7 +378,7 @@ const fetchBorrowRequests = async (readerID) => {
   }
 };
 
-// Return Book
+
 const returnBook = async (requestID, bookPostID, readerID) => {
   try {
     const token = JSON.parse(localStorage.getItem("token"))?.token;
@@ -409,7 +409,7 @@ const returnBook = async (requestID, bookPostID, readerID) => {
   }
 };
 
-// Fetch Book Posts by Owner
+
 const fetchBookPostsByOwner = async (bookOwnerID, signal) => {
   try {
     const token = JSON.parse(localStorage.getItem("token"))?.token;

@@ -1,4 +1,4 @@
-/* Main Container */
+
 .form-container {
     width: 100%;
     max-width: 800px;
@@ -15,7 +15,7 @@
     align-items: center;
   }
   
-  /* Background Animation */
+  
   .form-container::before {
     content: '';
     position: absolute;
@@ -43,7 +43,7 @@
     pointer-events: none;
   }
   
-  /* Form Title */
+  
   .form-title {
     font-size: 2rem;
     font-weight: 700;
@@ -67,7 +67,7 @@
     border-radius: 2px;
   }
   
-  /* Error Message */
+ 
   .error-text {
     color: #e53e3e;
     background: #fff5f5;
@@ -79,7 +79,7 @@
     box-shadow: 0 2px 5px rgba(229, 62, 62, 0.1);
   }
   
-  /* Input Groups */
+  
   .input-group {
     margin-bottom: 1.5rem;
     display: flex;
@@ -88,7 +88,7 @@
     width: 100%;
   }
   
-  /* Labels */
+ 
   .input-label {
     flex: 0 0 150px;
     font-size: 1rem;
@@ -113,7 +113,7 @@
     opacity: 1;
   }
   
-  /* Input Fields */
+  
   .input-field {
     flex: 1;
     padding: 12px;
@@ -137,13 +137,13 @@
     color: #a0aec0;
   }
   
-  /* Textarea Specific */
+  
   textarea.input-field {
     resize: vertical;
     min-height: 100px;
   }
   
-  /* File Input */
+  
   .file-input {
     padding: 8px;
     border: none;
@@ -151,7 +151,7 @@
     color: #4a5568;
   }
   
-  /* Cover Photo Preview */
+  
   .cover-preview {
     margin-top: 15px;
     display: flex;
@@ -172,7 +172,7 @@
     transform: scale(1.05);
   }
   
-  /* Button Group */
+  
   .button-group {
     display: flex;
     gap: 15px;
@@ -180,7 +180,7 @@
     margin-top: 2rem;
   }
   
-  /* Buttons */
+  
   .submit-button {
     position: relative;
     padding: 12px 30px;
@@ -230,7 +230,7 @@
     box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
   }
   
-  /* Animations */
+  
   @keyframes aurora {
     0% { background: linear-gradient(45deg, rgba(0, 123, 255, 0.1), rgba(0, 71, 171, 0.05)); }
     50% { background: linear-gradient(45deg, rgba(0, 71, 171, 0.05), rgba(0, 123, 255, 0.1)); }
@@ -243,7 +243,7 @@
     100% { transform: translate(0, 0); }
   }
   
-  /* Custom Scrollbar */
+  
   .form-container {
     scrollbar-width: thin;
     scrollbar-color: #888 #f1f1f1;

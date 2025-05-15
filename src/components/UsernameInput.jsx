@@ -1,5 +1,5 @@
 
-import '../styles/auth/components/inputs.css'; // Input field styles
+import '../styles/auth/components/inputs.css'; 
 
 function UsernameInput({ userName, setuserName, className }) {
   return (

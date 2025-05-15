@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SearchBar } from './SearchBar.jsx';
 import TopBar from "../components/top_bar";
-import axios from 'axios'; // Import axios
+import axios from 'axios';
 import '../Styles/SearchBar.css';
 import '../Styles/Search.css'
 
@@ -45,7 +45,7 @@ function Search() {
     console.log('Search - Raw API response:', data);
     const normalized = normalizeResults(data);
     setResults(normalized);
-    setHasFetchedAvailability(false); // Reset to allow one-time availability check
+    setHasFetchedAvailability(false); 
   };
   
 
@@ -94,7 +94,7 @@ function Search() {
       await Promise.all(promises);
       setAvailability(availabilityMap);
       setFailedBookIds(newFailedBookIds);
-      setHasFetchedAvailability(true); // Mark as done
+      setHasFetchedAvailability(true); 
       setLoading(false);
     };
   
@@ -145,7 +145,7 @@ function Search() {
             const coverSrc = bookPost.coverPhoto
               ? `data:image/jpeg;base64,${bookPost.coverPhoto}`
               : 'https://placehold.co/150x150';
-            console.log(`Book ${bookPost.bookPostID} coverSrc:`, coverSrc); // Debug log
+            console.log(`Book ${bookPost.bookPostID} coverSrc:`, coverSrc); 
             return (
               <div
                 key={bookPost.bookPostID}

@@ -6,12 +6,12 @@ import SubmitButton from './SubmitButton';
 import SwitchLink from './SwitchLink';
 import authService from '../services/auth.service';
 import LoginRoleSelector from './LoginRoleSelector';
-import '../Styles/auth/login.css'; // Shared auth styles
-import '../styles/auth/login.css'; // Login page specific styles
-import '../styles/auth/components/buttons.css'; // Button styles
-import '../styles/auth/components/forms.css'; // Form container styles
-import '../styles/auth/components/inputs.css'; // Input field styles
-import '../styles/auth/components/role-selector.css'; // Role selector component styles
+import '../Styles/auth/login.css'; 
+import '../styles/auth/login.css'; 
+import '../styles/auth/components/buttons.css'; 
+import '../styles/auth/components/forms.css'; 
+import '../styles/auth/components/inputs.css'; 
+import '../styles/auth/components/role-selector.css'; 
 
 function LoginPage({ setPage }) {
   const [userName, setUserName] = useState('');

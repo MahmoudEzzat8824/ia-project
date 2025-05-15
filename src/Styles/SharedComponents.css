@@ -1,4 +1,4 @@
-/* Shared Variables */
+
 :root {
     --primary-blue: #1e88e5;
     --dark-blue: #1565c0;
@@ -11,7 +11,7 @@
     --transition: all 0.3s ease;
   }
   
-  /* Base Input Styles (Username, Email, Password, Phone, SSN) */
+ 
   .input-container {
     margin-bottom: 1.5rem;
     width: 100%;
@@ -43,7 +43,7 @@
     box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.2);
   }
   
-  /* Password Input Specific */
+ 
   .password-container {
     position: relative;
   }
@@ -68,7 +68,7 @@
     height: 1.25rem;
   }
   
-  /* Error Message Style */
+
   .input-error {
     color: #e53935;
     font-size: 0.85rem;
