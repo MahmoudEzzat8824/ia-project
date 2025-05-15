@@ -9,13 +9,13 @@ import '../Styles/ProfilePage.css'
 
 function ProfilePage() {
 
-    // useEffect(() => {
-    //     const interval = setInterval(() => {
-    //       authService.refreshTokenIfNeeded();
-    //     }, 60000); // Check every 60 seconds
-    
-    //     return () => clearInterval(interval);
-    //   }, []);
+   useEffect(() => {
+    const interval = setInterval(() => {
+      authService.refreshTokenIfNeeded();
+    }, 60000); // Check every 60 seconds
+
+    return () => clearInterval(interval);
+  }, []);
       
   const [borrowRequests, setBorrowRequests] = useState([]);
   const [loading, setLoading] = useState(true);

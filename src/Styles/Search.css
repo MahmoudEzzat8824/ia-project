@@ -1,26 +1,26 @@
 body {
-  padding-top: 0; /* Remove any default body padding */
-  margin: 0; /* Remove default margin */
+  padding-top: 0; 
+  margin: 0;
 }
-/* Search Component - Fancy White-Blue Theme */
+
 .search-page {
   max-width: 100%;
-  margin: 0 auto; /* Remove all vertical margins */
-  padding: 0 1rem 2rem 1rem; /* Only bottom padding */
+  margin: 0 auto; 
+  padding: 0 1rem 2rem 1rem; 
   background: linear-gradient(135deg, #e6f0ff 0%, #f5faff 100%);
   min-height: 100vh;
   box-sizing: border-box;
   font-family: 'Georgia', serif;
   position: relative;
   z-index: 10;
-  top: 0; /* Ensure it starts at the very top */
+  top: 0; 
 }
   
 .search-page {
-  padding-top: [height-of-your-topbar]; /* e.g., 4rem if your TopBar is 4rem tall */
+  padding-top: [height-of-your-topbar]; 
   margin-top: 0;
 }
-  /* Decorative Background Element */
+ 
   .search-page::before {
     content: '';
     position: absolute;
@@ -33,10 +33,10 @@ body {
     pointer-events: none;
   }
   
-  /* Heading */
+  
   .search-page h1 {
     font-size: 2.5rem;
-    color: #1e3a8a; /* Dark blue */
+    color: #1e3a8a; 
     text-align: center;
     margin-bottom: 2.5rem;
     font-weight: bold;
@@ -48,7 +48,7 @@ body {
     transform: scale(1.02);
   }
   
-  /* SearchBar Container */
+  
   .search-page .mb-10 {
     display: flex;
     justify-content: center;
@@ -57,13 +57,13 @@ body {
   
   .search-page .max-w-5xl {
     width: 100%;
-    max-width: 1280px; /* Match max-w-5xl */
+    max-width: 1280px; 
   }
   
-  /* Error and Loading Messages */
+ 
   .search-page p.text-red-500 {
     font-size: 1.2rem;
-    color: #dc2626; /* Red */
+    color: #dc2626;
     text-align: center;
     padding: 1rem;
     background: rgba(255, 255, 255, 0.8);
@@ -76,7 +76,7 @@ body {
   
   .search-page p.text-gray-600 {
     font-size: 1.2rem;
-    color: #374151; /* Dark gray */
+    color: #374151; 
     text-align: center;
     padding: 1rem;
     background: rgba(255, 255, 255, 0.8);
@@ -86,11 +86,11 @@ body {
     font-weight: 500;
   }
   
-  /* Grid Container */
+ 
   .search-page .grid {
     display: grid;
     gap: 2rem;
-    max-width: 1536px; /* Match max-w-6xl */
+    max-width: 1536px; 
     margin: 0 auto;
     width: 100%;
     box-sizing: border-box;
@@ -98,11 +98,11 @@ body {
   
   /* Book Post Card */
   .search-page .book-post-card {
-    background: rgba(255, 255, 255, 0.85); /* Glassmorphism effect */
+    background: rgba(255, 255, 255, 0.85); 
     backdrop-filter: blur(10px);
     border-radius: 12px;
     border: 1px solid rgba(191, 219, 254, 0.5);
-    padding: 0; /* Override Tailwind padding */
+    padding: 0; 
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     box-sizing: border-box;
     overflow: hidden;
@@ -113,24 +113,24 @@ body {
     box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2);
   }
   
-  /* Book Cover */
+  
   .search-page .book-cover {
     width: 100%;
-    height: 14rem; /* Match h-56 */
+    height: 14rem; 
     object-fit: cover;
     border-top-left-radius: 12px;
     border-top-right-radius: 12px;
-    background: #f3f4f6; /* Fallback gray */
+    background: #f3f4f6; 
   }
   
-  /* Book Post Card Content */
+  
   .search-page .book-post-card .p-5 {
     padding: 1.5rem;
   }
   
   .search-page .book-post-card h2 {
     font-size: 1.5rem;
-    color: #1e3a8a; /* Dark blue */
+    color: #1e3a8a; 
     font-weight: bold;
     margin-bottom: 0.75rem;
     overflow: hidden;
@@ -140,45 +140,45 @@ body {
   }
   
   .search-page .book-post-card h2:hover {
-    color: #3b82f6; /* Vibrant blue */
+    color: #3b82f6; 
   }
   
   .search-page .book-post-card p {
     font-size: 1rem;
-    color: #374151; /* Dark gray */
+    color: #374151; 
     margin: 0.3rem 0;
     font-style: italic;
   }
   
   .search-page .book-post-card p strong {
-    color: #1e40af; /* Slightly lighter blue */
+    color: #1e40af; 
     font-weight: bold;
   }
   
-  /* Availability Text */
+  
   .search-page .book-post-card p.text-green-600 {
     font-size: 1rem;
-    color: #16a34a; /* Green */
+    color: #16a34a; 
     font-weight: 500;
     margin: 0.5rem 0;
   }
   
   .search-page .book-post-card p.text-red-600 {
     font-size: 1rem;
-    color: #dc2626; /* Red */
+    color: #dc2626; 
     font-weight: 500;
     margin: 0.5rem 0;
   }
   
-  /* View Details Button */
+  
   .search-page .book-post-card button {
     display: block;
     width: 100%;
     padding: 0.75rem 1.5rem;
     font-size: 1.1rem;
     border: none;
-    border-radius: 50px; /* Pill-shaped */
-    background: linear-gradient(90deg, #3b82f6, #60a5fa); /* Blue gradient */
+    border-radius: 50px; 
+    background: linear-gradient(90deg, #3b82f6, #60a5fa); 
     color: #ffffff;
     cursor: pointer;
     text-align: center;
@@ -198,7 +198,7 @@ body {
   /* Responsive Design */
   @media (min-width: 640px) {
     .search-page .grid {
-      grid-template-columns: repeat(2, 1fr); /* 2 columns on sm screens */
+      grid-template-columns: repeat(2, 1fr); 
     }
   
     .search-page {
@@ -216,7 +216,7 @@ body {
   
   @media (min-width: 1024px) {
     .search-page .grid {
-      grid-template-columns: repeat(3, 1fr); /* 3 columns on lg screens */
+      grid-template-columns: repeat(3, 1fr); 
     }
   
     .search-page h1 {
@@ -239,7 +239,7 @@ body {
   
   @media (max-width: 640px) {
     .search-page {
-      margin: 5rem auto 1rem auto; /* Adjusted for mobile TopBar */
+      margin: 5rem auto 1rem auto; 
       padding: 1.5rem 0.75rem;
     }
   
@@ -309,6 +309,6 @@ body {
     top: 0;
     width: 100%;
     z-index: 1000;
-    /* Your TopBar styles */
+    
 }
 

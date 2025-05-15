@@ -1,5 +1,5 @@
 import React from 'react';
-import '../styles/auth/components/inputs.css'; // Input field styles
+import '../styles/auth/components/inputs.css'; 
 
 function SSNInput({ ssn, setSsn, className }) {
   return (

@@ -12,7 +12,7 @@ function SearchResults() {
   const [error, setError] = useState(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  // Fetch book posts from API
+
   useEffect(() => {
     const fetchBooks = async () => {
       setLoading(true);
@@ -51,7 +51,6 @@ function SearchResults() {
     fetchBooks();
   }, [location.state?.query, refreshTrigger]);
 
-  // Fetch availability for books
   useEffect(() => {
     const fetchAvailability = async () => {
       const availabilityMap = {};

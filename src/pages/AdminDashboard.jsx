@@ -15,6 +15,14 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const interval = setInterval(() => {
+      authService.refreshTokenIfNeeded();
+    }, 60000); // Check every 60 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
     const checkAuthorization = () => {
       const storedData = localStorage.getItem("token");
       if (!storedData) {

@@ -9,7 +9,7 @@ import BookPost from "./components/BookPost";
 import ProfilePage from "./pages/ProfilePage";
 import AdminDashboard from "./pages/AdminDashboard";
 import BookOwnerPage from "./pages/BookOwnerPage";
-import Search from "./components/search";
+import Search from "./components/Search";
 import HomePageWithoutLogin from "./pages/HomePageWithoutLogin";
 import BookDetailsPage from "./pages/BookDetailsPage";
 import HomePageWithLogin from "./pages/HomePageWithLogin";

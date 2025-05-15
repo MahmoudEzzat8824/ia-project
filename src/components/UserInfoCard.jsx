@@ -28,8 +28,8 @@ export default function UserInfoCard() {
     setReaderDetails(details);
     setBookOwnerDetails(ownerDetails);
 
-    // No need for interval unless token changes dynamically
-  }, []); // Run once on mount
+    
+  }, []); 
 
   return (
     <div className="user-info-card">

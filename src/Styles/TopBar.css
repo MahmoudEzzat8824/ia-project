@@ -1,7 +1,7 @@
-/* TopBar styles */
+
 .top_bar {
   width: 100%;
-  background: rgba(255, 255, 255, 0.1); /* Glassmorphic translucent background */
+  background: rgba(255, 255, 255, 0.1); 
   border-radius: 16px;
   box-shadow: 0 8px 32px rgba(0, 71, 171, 0.2);
   backdrop-filter: blur(12px); /* Glassmorphism effect */
@@ -20,7 +20,7 @@
 
 .top_bar:hover {
   transform: translateY(-3px);
-  background: rgba(255, 255, 255, 0.15); /* Subtle hover effect */
+  background: rgba(255, 255, 255, 0.15); 
 }
 
 .web_logo {
@@ -38,7 +38,7 @@
   font-size: 24px;
   font-weight: 900;
   color: transparent;
-  background: linear-gradient(90deg, #007bff, #00d4ff); /* White-blue gradient */
+  background: linear-gradient(90deg, #007bff, #00d4ff); 
   -webkit-background-clip: text;
   background-clip: text;
   text-transform: uppercase;
@@ -56,7 +56,7 @@
 .logoutButton {
   font-size: 14px;
   font-weight: 700;
-  color: #007bff; /* Blue text */
+  color: #007bff; 
   position: relative;
   text-decoration: none;
   display: inline-flex;
@@ -64,7 +64,7 @@
   gap: 6px;
   padding: 8px 12px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.2); /* Glassmorphic button background */
+  background: rgba(255, 255, 255, 0.2); 
   border: 1px solid rgba(255, 255, 255, 0.3);
   box-shadow: 0 4px 16px rgba(0, 71, 171, 0.15);
   transition: transform 0.3s ease, box-shadow 0.3s ease, color 0.3s ease, background 0.3s ease;
@@ -96,7 +96,7 @@
 .logoutButton:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(0, 123, 255, 0.5);
-  color: #00d4ff; /* Lighter blue on hover */
+  color: #00d4ff; 
   background: rgba(255, 255, 255, 0.3);
 }
 

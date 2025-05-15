@@ -11,7 +11,7 @@ function TopBar() {
       const rawToken = localStorage.getItem('token');
       if (!rawToken) return null;
       const parsed = JSON.parse(rawToken);
-      return parsed.role || null; // Assuming role is stored in token
+      return parsed.role || null; 
     } catch (error) {
       console.error('Error parsing token:', error);
       return null;

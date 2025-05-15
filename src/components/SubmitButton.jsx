@@ -1,4 +1,4 @@
-import '../styles/auth/components/buttons.css'; // Button styles
+import '../styles/auth/components/buttons.css'; 
 
 function SubmitButton({ handleLogin }) {
     return (

@@ -24,7 +24,7 @@ function HomePageWithoutLogin({ currentUser, books, onLoginClick }) {
   return (
     <>
       <TopBar />
-      <div className="HomePageWithLogin"> {/* Added wrapper to match CSS selector */}
+      <div className="HomePageWithLogin"> 
         <div className="main-page">
           <UserNotLoggedCard onLoginClick={onLoginClick} />
           <Posts books={books} />
