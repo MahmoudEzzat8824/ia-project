@@ -697,6 +697,53 @@ const checkLike = async (readerID, bookPostID) => {
   }
 };
 
+const updateBookPost = async (postId, updatedData, token) => {
+  try {
+    // Log the FormData contents for debugging
+    console.log('Sending updateBookPost request with postId:', postId);
+    for (let [key, value] of updatedData.entries()) {
+      console.log(`${key}: ${value instanceof File ? 'File' : value}`);
+    }
+
+    const response = await axios.put(
+      `${API_URL}/api/bookowner/updateBookPost/${postId}`,
+      updatedData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error editing book post:', error);
+    if (error.response) {
+      console.error('Server response:', error.response.data);
+    }
+    throw error;
+  }
+};
+
+const deleteBookPost = async (postId, token) => {
+  try {
+    const response = await axios.delete(
+      `${API_URL}/api/bookowner/${postId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting book post:", error);
+    throw error;
+  }
+};
+
+
+
 const authService = {
   AdminLogin,
   createAdmin,
@@ -721,6 +768,8 @@ const authService = {
   checkLike,
   startSignalR,
   stopSignalR,
+  updateBookPost,
+  deleteBookPost,
   getReaderDetails: () => {
     const tokenData = JSON.parse(localStorage.getItem("token"));
     if (tokenData && tokenData.role === "reader") {
